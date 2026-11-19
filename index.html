@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Salasilah S.I.N.A.R.S</title>
+<title>Salasilah Keluarga</title>
 <style>
 :root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
 @media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6;--cg:linear-gradient(135deg,#2c2b28,#363430);--bg2:#141311;--g1:rgba(95,194,187,.16);--g2:rgba(230,150,70,.12)}}
@@ -79,7 +79,7 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
 </head>
 <body>
 <header>
-  <h1>Salasilah SINARS</h1>
+  <h1>Salasilah S.I.N.A.R.S</h1>
   <div class="tools">
     <span id="st" style="font-size:12px;color:var(--mute)"></span>
     <button id="clr" aria-expanded="false">Warna</button>
@@ -92,7 +92,7 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
-<footer>Hak Cipta Oleh S.I.N.A.R.S</footer>
+<footer>Hak Cipta Dan Terpelihara S.I.N.A.R.S</footer>
 
 <div id="modal">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="v-name">
@@ -126,12 +126,12 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
     </div>
     <div id="edit" hidden>
       <div class="row">
-        <div><label for="f-g">Peranan (untuk mak ayah)</label><select id="f-g"><option value="">Tak set</option><option value="A">Ayah</option><option value="M">Mak</option></select></div>
-        <div></div>
+        <div><label for="f-name">Nama</label><input id="f-name"></div>
+        <div><label for="f-g">Jantina</label><select id="f-g"><option value="">Pilih jantina</option><option value="A">Lelaki</option><option value="M">Perempuan</option></select></div>
       </div>
       <div class="row">
-        <div><label for="f-name">Nama</label><input id="f-name"></div>
-        <div><label for="f-rel">Hubungan (contoh: Ayah, Anak sulung)</label><input id="f-rel"></div>
+        <div><label for="f-rel">Hubungan</label><select id="f-rel"></select><input id="f-relx" hidden placeholder="Tulis hubungan" style="margin-top:6px"></div>
+        <div id="w-ord"><label for="f-ord">Anak ke</label><select id="f-ord"></select></div>
       </div>
       <div class="row">
         <div><label for="f-born">Tarikh lahir</label><input id="f-born" type="date"></div>
@@ -149,7 +149,7 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
 
 <script>
 const EDIT_PASS='0000'; /* password untuk buka Edit / tambah orang. Kosongkan '' kalau tak nak kunci. */
-const DEFAULT_URL='https://script.google.com/macros/s/AKfycbzRRMYl0-q-jIpnEkRj9ZYmgc9IiebSKnJE1qQWO8vHhrw03mj7cQjXtikJ1PR32kemFg/exec'; /* optional: tampal URL Apps Script (/exec) kat sini supaya browser baru cuma perlu passphrase. URL ni bukan rahsia, passphrase yang jaga. */
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec'; /* optional: tampal URL Apps Script (/exec) kat sini supaya browser baru cuma perlu passphrase. URL ni bukan rahsia, passphrase yang jaga. */
 const KEY='salasilah.v1', W=150, H=52, GX=28, GY=72, CG=36;
 const HUE_G=[200,150,35,340,265,15,95,300];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null;
@@ -167,6 +167,7 @@ function norm(d){
   d.people.forEach(p=>{
     p.updatedAt=p.updatedAt||1; p.name=p.name||''; p.rel=p.rel||''; p.born=p.born||''; p.note=p.note||'';
     p.g=(p.g==='A'||p.g==='M')?p.g:'';
+    p.ord=/^([1-9]|10)$/.test(String(p.ord||''))?String(p.ord):'';
     p.parents=(p.parents||[]).filter(x=>ids.has(x));
     p.spouse=ids.has(p.spouse)?p.spouse:null; p.pet=!!p.pet;
   });
@@ -194,7 +195,7 @@ function build(p,d){
   if(members.length>1&&members[0].g==='M'&&members[1].g==='A')members.reverse();
   const ids=members.map(m=>m.id);
   const ch=db.people.filter(c=>!placed.has(c.id)&&c.parents.some(x=>ids.includes(x)))
-    .sort((a,b)=>a.pet-b.pet);
+    .sort((a,b)=>(a.pet-b.pet)||((+a.ord||99)-(+b.ord||99)));
   const n={members,d,kids:[]};
   ch.forEach(c=>{if(!placed.has(c.id))n.kids.push(build(c,d+1))});
   n.own=members.length*W+(members.length-1)*CG;
@@ -229,7 +230,7 @@ function render(){
   const walk=(n,br)=>{
     n.members.forEach((m,i)=>{
       const x=n.x+i*(W+CG), c=colorMode==='none'?'':' c', h=colorMode==='none'?'':`;--h:${hue(n,br)}`;
-      cards.push(`<button class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px${h}"><b>${esc(m.name||'Tanpa nama')}</b><span>${esc(m.rel)}</span></button>`);
+      cards.push(`<button class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px${h}"><b>${esc(m.name||'Tanpa nama')}</b><span>${esc([m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · '))}</span></button>`);
     });
     maxY=Math.max(maxY,n.y+H);
     const two=n.members.length>1;
@@ -264,6 +265,14 @@ syncColorUI();
 if(colorMode!=='none')$('cpanel').classList.add('open');
 
 /* ---------- popup ---------- */
+const RELS=['Aku','Ayah','Mak','Datuk','Nenek','Pasangan','Anak','Menantu','Cucu','Ayah mertua','Mak mertua','Adik-beradik','Haiwan'];
+$('f-rel').innerHTML='<option value="">Pilih hubungan</option>'+RELS.map(r=>`<option>${r}</option>`).join('')+'<option value="__x">Lain-lain…</option>';
+$('f-ord').innerHTML='<option value="">—</option>'+Array.from({length:10},(_,i)=>`<option value="${i+1}">Anak ke-${i+1}</option>`).join('');
+function setRel(v){
+  const x=v&&!RELS.includes(v);
+  $('f-rel').value=x?'__x':(v||''); $('f-relx').hidden=!x; $('f-relx').value=x?v:'';
+}
+const gLabel=p=>p.g==='A'?(p.pet?'Jantan':'Lelaki'):(p.g==='M'?(p.pet?'Betina':'Perempuan'):'');
 function fmtDate(s){
   if(!s)return '';
   try{return new Date(s+'T00:00').toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})}catch(e){return s}
@@ -271,7 +280,9 @@ function fmtDate(s){
 function openPanel(id,m='view'){
   const p=P(id); if(!p)return closePanel();
   sel=id; mode=m; $('lock').hidden=true; pending=null;
-  $('f-name').value=p.name; $('f-rel').value=p.rel; $('f-born').value=p.born; $('f-note').value=p.note; $('f-g').value=p.g||'';
+  $('f-name').value=p.name; $('f-born').value=p.born; $('f-note').value=p.note; $('f-g').value=p.g||'';
+  $('f-ord').value=p.ord||''; setRel(p.rel); $('w-ord').hidden=p.pet;
+  $('f-g').options[1].text=p.pet?'Jantan':'Lelaki'; $('f-g').options[2].text=p.pet?'Betina':'Perempuan';
   $('v-name').textContent=p.name||'Tanpa nama';
   $('v-rel').textContent=p.rel||(p.pet?'Haiwan':'');
   let hh=0; for(const ch of p.id)hh=(hh*31+ch.charCodeAt(0))%360;
@@ -280,6 +291,8 @@ function openPanel(id,m='view'){
   const info=$('v-info'); info.textContent='';
   const add=(k,v)=>{if(!v)return;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;info.append(dt,dd)};
   const par=p.parents.map(P).filter(Boolean);
+  add('Jantina',gLabel(p));
+  add('Anak ke',p.pet?'':p.ord);
   add('Lahir',fmtDate(p.born));
   const names=a=>a.map(x=>x.name||'Tanpa nama').join(', ');
   const sp=p.spouse&&P(p.spouse);
@@ -310,15 +323,26 @@ function openPanel(id,m='view'){
 }
 function closePanel(){sel=null;pending=null;$('lock').hidden=true;$('modal').classList.remove('open');render()}
 function addPerson(o){
-  const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',g:'',parents:[],spouse:null,pet:false},o);
+  const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',g:'',ord:'',parents:[],spouse:null,pet:false},o);
   db.people.push(p); return p;
 }
 function focusName(){const e=$('f-name');e.focus();e.select()}
 function after(p){save();openPanel(p.id,'edit')}
 
-['name','rel','born','note','g'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
+['name','born','note','g','ord'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
   const p=P(sel); if(!p)return; p[k]=e.target.value; p.updatedAt=Date.now(); save(); render();
 }));
+function setRelVal(v){const p=P(sel);if(!p)return;p.rel=v.trim();p.updatedAt=Date.now();save();render()}
+$('f-rel').addEventListener('input',()=>{
+  const x=$('f-rel').value==='__x'; $('f-relx').hidden=!x;
+  if(x){$('f-relx').focus();setRelVal($('f-relx').value)}else setRelVal($('f-rel').value);
+});
+$('f-relx').addEventListener('input',()=>setRelVal($('f-relx').value));
+/* parent tanpa jantina tak boleh jadi Ayah/Mak, paksa set dulu */
+function needG(p){
+  if(p.g)return false;
+  toast('Set jantina '+(p.name||'dia')+' dulu'); openPanel(p.id,'edit'); $('f-g').focus(); return true;
+}
 function gate(fn){
   if(unlocked||!EDIT_PASS){fn();return}
   pending=fn; $('view').hidden=true; $('edit').hidden=true; $('lock').hidden=false;
@@ -334,8 +358,16 @@ $('l-cancel').onclick=cancelLock;
 $('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
 
 $('a-edit').onclick=()=>gate(()=>openPanel(sel,'edit'));
-$('e-done').onclick=()=>{clearTimeout(save.t);openPanel(sel,'view');sync()};
-$('a-child').onclick=()=>gate(()=>{const p=P(sel),sp=p.spouse&&P(p.spouse);after(addPerson({parents:sp?[p.id,sp.id]:[p.id],rel:'Anak'}))});
+$('e-done').onclick=()=>{const q=P(sel);if(q&&!q.g){toast('Pilih jantina dulu');$('f-g').focus();return}clearTimeout(save.t);openPanel(sel,'view');sync()};
+$('a-child').onclick=()=>gate(()=>{
+  const p=P(sel); if(needG(p))return;
+  const sp=p.spouse&&P(p.spouse);
+  if(sp&&!sp.g){sp.g=p.g==='A'?'M':'A';sp.updatedAt=Date.now()}
+  const ids=sp?[p.id,sp.id]:[p.id];
+  const sibs=db.people.filter(c=>!c.pet&&ids.some(i=>c.parents.includes(i)));
+  const next=Math.min(10,Math.max(sibs.length,...sibs.map(c=>+c.ord||0))+1);
+  after(addPerson({parents:ids,rel:'Anak',ord:String(next)}));
+});
 $('a-pet').onclick=()=>gate(()=>{const p=P(sel);after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}))});
 /* tambah pasangan: anak2 yang cuma ada p sebagai mak/ayah auto disambung ke pasangan baru */
 $('a-spouse').onclick=()=>gate(()=>{
@@ -404,7 +436,7 @@ try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
 })();
 if(!cfg.url&&DEFAULT_URL){cfg={url:DEFAULT_URL,key:''};localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg))}
 const st=t=>$('st').textContent=t;
-const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,spouse:p.spouse||'',pet:p.pet,g:p.g||'',updatedAt:p.updatedAt});
+const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,spouse:p.spouse||'',pet:p.pet,g:p.g||'',ord:p.ord||'',updatedAt:p.updatedAt});
 function merge(rows){
   rows.forEach(r=>{
     const t=Number(r.updatedAt)||0, l=P(r.id);
@@ -414,7 +446,7 @@ function merge(rows){
     }
     if(db.tomb[r.id]&&db.tomb[r.id]>=t)return;
     if(l&&l.updatedAt>=t)return;
-    const n={id:r.id,name:r.name,rel:r.rel,born:r.born,note:r.note,parents:r.parents?r.parents.split(','):[],spouse:r.spouse||null,pet:r.pet==='1',g:r.g||'',updatedAt:t};
+    const n={id:r.id,name:r.name,rel:r.rel,born:r.born,note:r.note,parents:r.parents?r.parents.split(','):[],spouse:r.spouse||null,pet:r.pet==='1',g:r.g||'',ord:r.ord||'',updatedAt:t};
     if(l)Object.assign(l,n);else db.people.push(n);
   });
   norm(db);
