@@ -25,23 +25,23 @@ button.act,button.act:hover{background:var(--acc);border-color:var(--acc);color:
 button.act:hover{filter:brightness(1.12)}
 #cpanel{display:none;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:12px;color:var(--mute)}
 #cpanel.open{display:flex}
-#wrap{flex:1 1 auto;min-height:0;width:100%;overflow:auto;display:grid;place-items:center;padding:12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-#sizer{position:relative;flex:none}
+#wrap{flex:1 1 auto;min-height:0;width:100%;overflow:auto;padding:12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#sizer{position:relative;margin:auto;flex:none}
 #stage{position:relative;transform-origin:0 0}
 svg{position:absolute;left:0;top:0;pointer-events:none}
 svg path{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 6;opacity:.85;animation:flow 1.4s linear infinite}
 svg path.d{stroke-dasharray:1 7;stroke-width:3}
 @keyframes flow{to{stroke-dashoffset:-13}}
 .card{position:absolute;width:var(--cw,150px);height:var(--ch,52px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--cg);border:1.5px solid var(--acc);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .18s,background .2s}
-.card b{font-size:clamp(11px,1vw,13px);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
-.card span{font-size:clamp(10px,.85vw,11px);color:var(--mute);font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.card b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.card span{font-size:11px;color:var(--mute);font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card:hover{background:var(--cg);color:var(--ink);transform:translateY(-4px) scale(1.04);box-shadow:0 10px 20px rgba(0,0,0,.22);z-index:2}
 .card.c{--cbg:linear-gradient(135deg,hsl(var(--h) 60% calc(var(--cbg-l) + 6%)),hsl(calc(var(--h) + 25) 55% var(--cbg-l)));background:var(--cbg);color:var(--cfg);border-color:hsl(var(--h) 45% 45%)}
 .card.c span{color:var(--csub)}
 .card.c:hover{background:var(--cbg);color:var(--cfg)}
 .card.pet{border-style:dashed}
 .card.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
-#empty{text-align:center;padding:48px 20px;color:var(--mute);max-width:460px}
+#empty{text-align:center;padding:48px 20px;color:var(--mute);max-width:460px;margin:0 auto}
 #empty p{margin:0 0 18px;font-size:15px}
 
 /* popup */
@@ -194,7 +194,7 @@ let W=150,H=52,GX=28,GY=72,CG=36;
 
 function metrics(){
   const n=document.getElementById('wrap')?.clientWidth||innerWidth;
-  const m=n<480?[116,46,12,52,16]:(n<860?[134,50,18,62,24]:[150,52,28,72,36]);
+  const m=n<480?[124,48,12,56,14]:(n<860?[136,50,18,64,24]:[150,52,28,72,36]);
   const ch=m[0]!==W||m[1]!==H||m[2]!==GX||m[3]!==GY||m[4]!==CG;
   [W,H,GX,GY,CG]=m;
   const r=document.documentElement.style;
@@ -266,8 +266,8 @@ function layout(){
   const isRoot=p=>!p.parents.length&&!(p.spouse&&P(p.spouse)&&P(p.spouse).parents.length);
   db.people.forEach(p=>{if(!placed.has(p.id)&&isRoot(p))roots.push(build(p,0))});
   db.people.forEach(p=>{if(!placed.has(p.id))roots.push(build(p,0))});
-  let x=24; roots.forEach(r=>{place(r,x);x+=r.w+GX*2});
-  return {roots,w:Math.max(x-GX*2+24,260)};
+  let x=16; roots.forEach(r=>{place(r,x);x+=r.w+GX*2});
+  return {roots,w:Math.max(x-GX*2+16,240)};
 }
 
 /* ---------- render ---------- */
@@ -299,7 +299,7 @@ function render(){
     n.kids.forEach((k,i)=>walk(k,n.d===0?i:br));
   };
   roots.forEach(r=>walk(r,-1));
-  const stageH=maxY+16;
+  const stageH=maxY+12;
   stage.style.width=w+'px'; stage.style.height=stageH+'px'; dim={w,h:stageH};
   stage.innerHTML=`<svg width="${w}" height="${stageH}">${paths.map(p=>`<path${p[1]?' class="d"':''} d="${p[0]}"/>`).join('')}</svg>`+cards.join('');
   fit();
@@ -314,7 +314,12 @@ function fit(){
   const padY=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
   const aw=Math.max(120,wrap.clientWidth-padX);
   const ah=Math.max(120,wrap.clientHeight-padY);
-  const k=fitOn?Math.min(1,aw/dim.w,ah/dim.h):1;
+  let k=1;
+  if(fitOn){
+    k=wrap.clientWidth<640
+      ? Math.min(1, aw/dim.w, Math.max(0.45, ah/dim.h))
+      : Math.min(1, aw/dim.w, ah/dim.h);
+  }
   s.style.transform=k<1?`scale(${k})`:'';
   z.style.width=Math.ceil(dim.w*k)+'px';
   z.style.height=Math.ceil(dim.h*k)+'px';
