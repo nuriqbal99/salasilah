@@ -270,12 +270,22 @@ function openPanel(id,m='view'){
   const add=(k,v)=>{if(!v)return;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;info.append(dt,dd)};
   const par=p.parents.map(P).filter(Boolean);
   add('Lahir',fmtDate(p.born));
-  add('Ayah',par.filter(x=>x.g==='A').map(x=>x.name).join(', '));
-  add('Mak',par.filter(x=>x.g==='M').map(x=>x.name).join(', '));
-  add('Mak/Ayah',par.filter(x=>!x.g).map(x=>x.name).join(', '));
-  add('Pasangan',p.spouse&&P(p.spouse)?P(p.spouse).name:'');
+  const names=a=>a.map(x=>x.name||'Tanpa nama').join(', ');
+  const sp=p.spouse&&P(p.spouse);
+  const mertua=(!par.length&&sp)?sp.parents.map(P).filter(Boolean):[];
+  if(par.length){
+    add('Ayah',names(par.filter(x=>x.g==='A'))||'—');
+    add('Mak',names(par.filter(x=>x.g==='M'))||'—');
+    add('Mak/Ayah',names(par.filter(x=>!x.g)));
+  }
+  add('Pasangan',sp?(sp.name||'Tanpa nama'):'');
+  add('Ayah mertua',names(mertua.filter(x=>x.g==='A')));
+  add('Mak mertua',names(mertua.filter(x=>x.g==='M')));
+  add('Mertua',names(mertua.filter(x=>!x.g)));
   const kids=db.people.filter(c=>c.parents.includes(p.id)&&!c.pet);
-  add('Anak',kids.length?kids.map(x=>x.name).join(', '):'');
+  const menantu=kids.map(c=>c.spouse&&P(c.spouse)).filter(x=>x&&!x.parents.includes(p.id));
+  add('Anak',names(kids));
+  add('Menantu',names(menantu));
   add('Nota',p.note);
   if(!info.children.length)add('Info','Belum ada maklumat. Tekan Edit.');
   const hasA=par.some(x=>x.g==='A'), hasM=par.some(x=>x.g==='M');
@@ -320,14 +330,15 @@ $('a-pet').onclick=()=>gate(()=>{const p=P(sel);after(addPerson({parents:[p.id],
 $('a-spouse').onclick=()=>gate(()=>{
   const p=P(sel), g=p.g==='M'?'A':(p.g==='A'?'M':'');
   const kids=db.people.filter(c=>!c.pet&&c.parents.length===1&&c.parents[0]===p.id);
-  const n=addPerson({spouse:p.id,g,rel:(kids.length&&g)?(g==='A'?'Ayah':'Mak'):'Pasangan'});
+  const n=addPerson({spouse:p.id,g,rel:p.parents.length?'Menantu':((kids.length&&g)?(g==='A'?'Ayah':'Mak'):'Pasangan')});
   const now=Date.now(); p.spouse=n.id; p.updatedAt=now;
   kids.forEach(c=>{c.parents.push(n.id);c.updatedAt=now});
   after(n);
 });
 /* tambah ayah/mak: adik-beradik (set mak/ayah sama) auto dapat parent baru sekali */
 function addParent(g){
-  const p=P(sel), n=addPerson({g,rel:g==='A'?'Ayah':'Mak',name:g==='A'?'Nama ayah':'Nama mak'});
+  const p=P(sel), ps=p.spouse&&P(p.spouse), men=!p.parents.length&&ps&&ps.parents.length>0;
+  const n=addPerson({g,rel:men?(g==='A'?'Ayah mertua':'Mak mertua'):(g==='A'?'Ayah':'Mak'),name:g==='A'?'Nama ayah':'Nama mak'});
   const key=a=>a.parents.slice().sort().join(','), k=key(p), now=Date.now();
   const sibs=k?db.people.filter(c=>c.id!==p.id&&c.id!==n.id&&!c.pet&&key(c)===k):[];
   const other=p.parents.map(P).filter(Boolean)[0];
