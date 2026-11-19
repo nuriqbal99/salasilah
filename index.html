@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Salasilah SINARS</title>
+<title>Salasilah Keluarga</title>
 <style>
 :root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
 @media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6;--cg:linear-gradient(135deg,#2c2b28,#363430);--bg2:#141311;--g1:rgba(95,194,187,.16);--g2:rgba(230,150,70,.12)}}
@@ -67,6 +67,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0
 textarea{resize:vertical;min-height:70px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .acts .sp{flex:1}
+#lock input{margin-top:14px}
 .danger{border-color:#b3261e;color:#b3261e}
 .danger:hover{background:#b3261e;color:#fff}
 #toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
@@ -110,6 +111,17 @@ textarea{resize:vertical;min-height:70px}
         <button id="a-close">Tutup</button>
       </div>
     </div>
+    <div id="lock" hidden>
+      <h2>Edit dikunci</h2>
+      <div class="sub">Masukkan password untuk teruskan.</div>
+      <input id="l-pass" type="password" autocomplete="off" placeholder="Password">
+      <div id="l-err" class="sub" style="color:#b3261e;margin-top:8px;min-height:1em"></div>
+      <div class="acts">
+        <button id="l-ok" class="act">Buka</button>
+        <span class="sp"></span>
+        <button id="l-cancel">Batal</button>
+      </div>
+    </div>
     <div id="edit" hidden>
       <div class="row">
         <div><label for="f-name">Nama</label><input id="f-name"></div>
@@ -130,10 +142,11 @@ textarea{resize:vertical;min-height:70px}
 <div id="toast"></div>
 
 <script>
+const EDIT_PASS='0000'; /* password untuk buka Edit / tambah orang. Kosongkan '' kalau tak nak kunci. */
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbzRRMYl0-q-jIpnEkRj9ZYmgc9IiebSKnJE1qQWO8vHhrw03mj7cQjXtikJ1PR32kemFg/exec'; /* optional: tampal URL Apps Script (/exec) kat sini supaya browser baru cuma perlu passphrase. URL ni bukan rahsia, passphrase yang jaga. */
 const KEY='salasilah.v1', W=150, H=52, GX=28, GY=72, CG=36;
 const HUE_G=[200,150,35,340,265,15,95,300];
-let db=load(), sel=null, mode='view', placed=new Set();
+let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null;
 let colorMode=localStorage.getItem(KEY+'.color')||'none';
 
 function load(){
@@ -246,7 +259,7 @@ function fmtDate(s){
 }
 function openPanel(id,m='view'){
   const p=P(id); if(!p)return closePanel();
-  sel=id; mode=m;
+  sel=id; mode=m; $('lock').hidden=true; pending=null;
   $('f-name').value=p.name; $('f-rel').value=p.rel; $('f-born').value=p.born; $('f-note').value=p.note;
   $('v-name').textContent=p.name||'Tanpa nama';
   $('v-rel').textContent=p.rel||(p.pet?'Haiwan':'');
@@ -274,7 +287,7 @@ function openPanel(id,m='view'){
   $('modal').classList.add('open'); render();
   if(m==='edit')focusName(); else $('a-edit').focus();
 }
-function closePanel(){sel=null;$('modal').classList.remove('open');render()}
+function closePanel(){sel=null;pending=null;$('lock').hidden=true;$('modal').classList.remove('open');render()}
 function addPerson(o){
   const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',g:'',parents:[],spouse:null,pet:false},o);
   db.people.push(p); return p;
@@ -285,20 +298,45 @@ function after(p){save();openPanel(p.id,'edit')}
 ['name','rel','born','note'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
   const p=P(sel); if(!p)return; p[k]=e.target.value; p.updatedAt=Date.now(); save(); render();
 }));
-$('a-edit').onclick=()=>openPanel(sel,'edit');
+function gate(fn){
+  if(unlocked||!EDIT_PASS){fn();return}
+  pending=fn; $('view').hidden=true; $('edit').hidden=true; $('lock').hidden=false;
+  $('modal').classList.add('open'); $('l-pass').value=''; $('l-err').textContent=''; $('l-pass').focus();
+}
+function tryUnlock(){
+  if($('l-pass').value===EDIT_PASS){unlocked=true;$('lock').hidden=true;const f=pending;pending=null;if(f)f()}
+  else{$('l-err').textContent='Password salah';$('l-pass').select()}
+}
+function cancelLock(){pending=null;$('lock').hidden=true;if(sel&&P(sel))openPanel(sel,'view');else closePanel()}
+$('l-ok').onclick=tryUnlock;
+$('l-cancel').onclick=cancelLock;
+$('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
+
+$('a-edit').onclick=()=>gate(()=>openPanel(sel,'edit'));
 $('e-done').onclick=()=>{clearTimeout(save.t);openPanel(sel,'view');sync()};
-$('a-child').onclick=()=>{const p=P(sel),sp=p.spouse&&P(p.spouse);after(addPerson({parents:sp?[p.id,sp.id]:[p.id],rel:'Anak'}))};
-$('a-pet').onclick=()=>{const p=P(sel);after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}))};
-$('a-spouse').onclick=()=>{const p=P(sel),n=addPerson({spouse:p.id,rel:'Pasangan'});p.spouse=n.id;p.updatedAt=Date.now();after(n)};
+$('a-child').onclick=()=>gate(()=>{const p=P(sel),sp=p.spouse&&P(p.spouse);after(addPerson({parents:sp?[p.id,sp.id]:[p.id],rel:'Anak'}))});
+$('a-pet').onclick=()=>gate(()=>{const p=P(sel);after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}))});
+/* tambah pasangan: anak2 yang cuma ada p sebagai mak/ayah auto disambung ke pasangan baru */
+$('a-spouse').onclick=()=>gate(()=>{
+  const p=P(sel), g=p.g==='M'?'A':(p.g==='A'?'M':'');
+  const kids=db.people.filter(c=>!c.pet&&c.parents.length===1&&c.parents[0]===p.id);
+  const n=addPerson({spouse:p.id,g,rel:(kids.length&&g)?(g==='A'?'Ayah':'Mak'):'Pasangan'});
+  const now=Date.now(); p.spouse=n.id; p.updatedAt=now;
+  kids.forEach(c=>{c.parents.push(n.id);c.updatedAt=now});
+  after(n);
+});
+/* tambah ayah/mak: adik-beradik (set mak/ayah sama) auto dapat parent baru sekali */
 function addParent(g){
   const p=P(sel), n=addPerson({g,rel:g==='A'?'Ayah':'Mak',name:g==='A'?'Nama ayah':'Nama mak'});
+  const key=a=>a.parents.slice().sort().join(','), k=key(p), now=Date.now();
+  const sibs=k?db.people.filter(c=>c.id!==p.id&&c.id!==n.id&&!c.pet&&key(c)===k):[];
   const other=p.parents.map(P).filter(Boolean)[0];
-  p.parents.push(n.id); p.updatedAt=Date.now();
-  if(other&&!other.spouse&&!n.spouse){other.spouse=n.id;n.spouse=other.id;other.updatedAt=Date.now()}
+  [p,...sibs].forEach(c=>{c.parents.push(n.id);c.updatedAt=now});
+  if(other&&!other.spouse){other.spouse=n.id;n.spouse=other.id;other.updatedAt=now}
   after(n);
 }
-$('a-father').onclick=()=>addParent('A');
-$('a-mother').onclick=()=>addParent('M');
+$('a-father').onclick=()=>gate(()=>addParent('A'));
+$('a-mother').onclick=()=>gate(()=>addParent('M'));
 $('a-close').onclick=closePanel;
 $('modal').addEventListener('click',e=>{if(e.target.id==='modal')closePanel()});
 $('a-del').onclick=()=>{
@@ -319,12 +357,14 @@ $('a-del').onclick=()=>{
   norm(db); save(); closePanel(); toast('Dipadam');
 };
 document.addEventListener('keydown',e=>{
-  if(e.key!=='Escape'||!sel)return;
+  if(e.key!=='Escape')return;
+  if(!$('lock').hidden)return cancelLock();
+  if(!sel)return;
   if(mode==='edit')openPanel(sel,'view'); else closePanel();
 });
 $('stage').addEventListener('click',e=>{
   if(e.target.id==='conn')return setupSync();
-  if(e.target.id==='first'){const p=addPerson({name:'Aku',rel:'Aku'});return after(p)}
+  if(e.target.id==='first')return gate(()=>{const p=addPerson({name:'Aku',rel:'Aku'});after(p)});
   const c=e.target.closest('.card'); if(c)openPanel(c.dataset.id,'view');
 });
 
