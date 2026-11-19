@@ -5,11 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Salasilah Keluarga</title>
 <style>
-:root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c}
-@media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6}}
+:root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6;--cg:linear-gradient(135deg,#2c2b28,#363430);--bg2:#141311;--g1:rgba(95,194,187,.16);--g2:rgba(230,150,70,.12)}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html{background:var(--bg2)}
+html,body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(circle at 12% 0%,var(--g1),transparent 46%),radial-gradient(circle at 92% 18%,var(--g2),transparent 42%),radial-gradient(circle at 50% 100%,var(--g1),transparent 50%),linear-gradient(180deg,var(--bg),var(--bg2));background-attachment:fixed}
+#wrap{flex:1}
+footer{text-align:center;padding:18px 16px 26px;font-size:12px;letter-spacing:.1em;color:var(--mute);border-top:1px dashed rgba(128,128,128,.4);margin:0 24px}
 header{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:22px 16px 6px}
 h1{margin:0;width:100%;text-align:center;font:500 clamp(28px,5vw,44px)/1.1 "Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;letter-spacing:.02em}
 .tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
@@ -25,13 +29,14 @@ button.act:hover{filter:brightness(1.12)}
 #wrap{overflow:auto;padding:24px 0 60px;min-height:60vh}
 #stage{position:relative;margin:0 auto}
 svg{position:absolute;left:0;top:0;pointer-events:none}
-svg path{fill:none;stroke:var(--line);stroke-width:1.5}
-svg path.d{stroke-dasharray:4 4}
-.card{position:absolute;width:150px;height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--card);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .18s,background .2s}
+svg path{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 6;opacity:.85;animation:flow 1.4s linear infinite}
+svg path.d{stroke-dasharray:1 7;stroke-width:3}
+@keyframes flow{to{stroke-dashoffset:-13}}
+.card{position:absolute;width:150px;height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--cg);border:1.5px solid var(--acc);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .18s,background .2s}
 .card b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card span{font-size:11px;color:var(--mute);font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
-.card:hover{background:var(--card);color:var(--ink);transform:translateY(-4px) scale(1.04);box-shadow:0 10px 20px rgba(0,0,0,.22);z-index:2}
-.card.c{--cbg:hsl(var(--h) 55% var(--cbg-l));background:var(--cbg);color:var(--cfg);border-color:hsl(var(--h) 40% 45%)}
+.card:hover{background:var(--cg);color:var(--ink);transform:translateY(-4px) scale(1.04);box-shadow:0 10px 20px rgba(0,0,0,.22);z-index:2}
+.card.c{--cbg:linear-gradient(135deg,hsl(var(--h) 60% calc(var(--cbg-l) + 6%)),hsl(calc(var(--h) + 25) 55% var(--cbg-l)));background:var(--cbg);color:var(--cfg);border-color:hsl(var(--h) 45% 45%)}
 .card.c span{color:var(--csub)}
 .card.c:hover{background:var(--cbg);color:var(--cfg)}
 .card.pet{border-style:dashed}
@@ -66,7 +71,7 @@ textarea{resize:vertical;min-height:70px}
 .danger:hover{background:#b3261e;color:#fff}
 #toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 #toast.on{opacity:1}
-@media (prefers-reduced-motion:reduce){#toast,.card,button{transition:none}#modal.open,.sheet{animation:none}.card:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){#toast,.card,button{transition:none}#modal.open,.sheet,svg path{animation:none}.card:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -89,6 +94,7 @@ textarea{resize:vertical;min-height:70px}
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
+<footer>Hak Cipta Oleh S.I.N.A.R.S</footer>
 
 <div id="modal">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="v-name">
