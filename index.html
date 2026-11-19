@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Salasilah Keluarga</title>
+<title>Salasilah S.I.N.A.R.S</title>
 <style>
 :root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
 @media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6;--cg:linear-gradient(135deg,#2c2b28,#363430);--bg2:#141311;--g1:rgba(95,194,187,.16);--g2:rgba(230,150,70,.12)}}
@@ -68,6 +68,8 @@ textarea{resize:vertical;min-height:70px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .acts .sp{flex:1}
 #lock input{margin-top:14px}
+select{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--mute);border-radius:10px;padding:8px 10px}
+select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 30%,transparent)}
 .danger{border-color:#b3261e;color:#b3261e}
 .danger:hover{background:#b3261e;color:#fff}
 #toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
@@ -124,6 +126,10 @@ textarea{resize:vertical;min-height:70px}
     </div>
     <div id="edit" hidden>
       <div class="row">
+        <div><label for="f-g">Peranan (untuk mak ayah)</label><select id="f-g"><option value="">Tak set</option><option value="A">Ayah</option><option value="M">Mak</option></select></div>
+        <div></div>
+      </div>
+      <div class="row">
         <div><label for="f-name">Nama</label><input id="f-name"></div>
         <div><label for="f-rel">Hubungan (contoh: Ayah, Anak sulung)</label><input id="f-rel"></div>
       </div>
@@ -164,6 +170,11 @@ function norm(d){
     p.parents=(p.parents||[]).filter(x=>ids.has(x));
     p.spouse=ids.has(p.spouse)?p.spouse:null; p.pet=!!p.pet;
   });
+  const pid=new Set(); d.people.forEach(p=>p.parents.forEach(x=>pid.add(x)));
+  const guess=p=>{const r=(p.rel||'').toLowerCase(),a=/\b(ayah|abah|bapa|ayahanda|papa|dad|abi)\b/.test(r),m=/\b(mak|emak|ibu|ummi|umi|mama|bonda|mom)\b/.test(r);return a&&!m?'A':(m&&!a?'M':'')};
+  const now=Date.now();
+  d.people.forEach(p=>{if(pid.has(p.id)&&!p.g){const g=guess(p);if(g){p.g=g;p.updatedAt=now}}});
+  d.people.forEach(p=>{if(pid.has(p.id)&&!p.g&&p.spouse){const s=d.people.find(x=>x.id===p.spouse);if(s&&s.g){p.g=s.g==='A'?'M':'A';p.updatedAt=now}}});
   return d;
 }
 function save(push=true){
@@ -260,7 +271,7 @@ function fmtDate(s){
 function openPanel(id,m='view'){
   const p=P(id); if(!p)return closePanel();
   sel=id; mode=m; $('lock').hidden=true; pending=null;
-  $('f-name').value=p.name; $('f-rel').value=p.rel; $('f-born').value=p.born; $('f-note').value=p.note;
+  $('f-name').value=p.name; $('f-rel').value=p.rel; $('f-born').value=p.born; $('f-note').value=p.note; $('f-g').value=p.g||'';
   $('v-name').textContent=p.name||'Tanpa nama';
   $('v-rel').textContent=p.rel||(p.pet?'Haiwan':'');
   let hh=0; for(const ch of p.id)hh=(hh*31+ch.charCodeAt(0))%360;
@@ -276,7 +287,7 @@ function openPanel(id,m='view'){
   if(par.length){
     add('Ayah',names(par.filter(x=>x.g==='A'))||'—');
     add('Mak',names(par.filter(x=>x.g==='M'))||'—');
-    add('Mak/Ayah',names(par.filter(x=>!x.g)));
+    add('Parent (belum set)',names(par.filter(x=>!x.g)));
   }
   add('Pasangan',sp?(sp.name||'Tanpa nama'):'');
   add('Ayah mertua',names(mertua.filter(x=>x.g==='A')));
@@ -305,7 +316,7 @@ function addPerson(o){
 function focusName(){const e=$('f-name');e.focus();e.select()}
 function after(p){save();openPanel(p.id,'edit')}
 
-['name','rel','born','note'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
+['name','rel','born','note','g'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
   const p=P(sel); if(!p)return; p[k]=e.target.value; p.updatedAt=Date.now(); save(); render();
 }));
 function gate(fn){
