@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Salasilah Keluarga</title>
 <style>
 :root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
@@ -27,12 +27,13 @@ button.act:hover{filter:brightness(1.12)}
 #cpanel{display:none;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:12px;color:var(--mute)}
 #cpanel.open{display:flex}
 #wrap{overflow:auto;padding:24px 0 60px;min-height:60vh}
-#stage{position:relative;margin:0 auto}
+#sizer{position:relative;margin:0 auto}
+#stage{position:relative;transform-origin:0 0}
 svg{position:absolute;left:0;top:0;pointer-events:none}
 svg path{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 6;opacity:.85;animation:flow 1.4s linear infinite}
 svg path.d{stroke-dasharray:1 7;stroke-width:3}
 @keyframes flow{to{stroke-dashoffset:-13}}
-.card{position:absolute;width:150px;height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--cg);border:1.5px solid var(--acc);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .18s,background .2s}
+.card{position:absolute;width:var(--cw,150px);height:var(--ch,52px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--cg);border:1.5px solid var(--acc);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .18s,background .2s}
 .card b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card span{font-size:11px;color:var(--mute);font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card:hover{background:var(--cg);color:var(--ink);transform:translateY(-4px) scale(1.04);box-shadow:0 10px 20px rgba(0,0,0,.22);z-index:2}
@@ -75,13 +76,67 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
 #toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 #toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){#toast,.card,button{transition:none}#modal.open,.sheet,svg path{animation:none}.card:hover{transform:none}}
+
+/* ---------- responsive ---------- */
+body{min-height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#wrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.sheet{width:min(520px,100%);max-height:min(88vh,88dvh)}
+.acts button{min-height:36px}
+
+/* tablet */
+@media (max-width:860px){
+  header{padding:16px 12px 4px;gap:10px}
+  #wrap{padding:18px 0 48px}
+  footer{margin:0 14px}
+}
+
+/* phone: popup jadi bottom sheet, butang besar, font input 16px supaya iOS tak auto-zoom */
+@media (max-width:600px){
+  #modal{align-items:flex-end;padding:0}
+  .sheet{width:100%;max-height:92dvh;border-radius:22px 22px 0 0;padding:26px 16px calc(16px + env(safe-area-inset-bottom));animation:rise .26s cubic-bezier(.2,.9,.3,1.1)}
+  .sheet h2{font-size:23px}
+  .av{width:50px;height:50px;font-size:22px}
+  dl{grid-template-columns:1fr;gap:2px 0;padding:12px 14px}
+  dt{font-size:12px;margin-top:6px}
+  .acts{gap:8px}
+  .acts button{flex:1 1 calc(50% - 8px);min-height:44px;font-size:14px}
+  .acts .sp{display:none}
+  input,textarea,select{font-size:16px;min-height:44px}
+  textarea{min-height:80px}
+  .tools button,#cpanel button{min-height:40px;padding:8px 16px}
+  .card b{font-size:12px}
+  .card span{font-size:10.5px}
+  #toast{left:12px;right:12px;top:max(12px,env(safe-area-inset-top));text-align:center}
+  footer{font-size:11px;margin:0 12px}
+}
+@keyframes rise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+
+/* phone landscape / skrin rendah */
+@media (max-height:480px) and (orientation:landscape){
+  .sheet{max-height:96dvh;padding-top:22px}
+  header{padding-top:8px}
+}
+
+/* desktop besar */
+@media (min-width:1200px){
+  h1{font-size:48px}
+  .sheet{width:min(560px,100%)}
+  #wrap{padding-top:32px}
+}
+
+/* touch: hover effect tak guna kat jari, jangan bagi kad "tersangkut" lepas tap */
+@media (hover:none){
+  .card:hover{transform:none;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .acts button:hover,.tools button:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>Salasilah S.I.N.A.R.S</h1>
+  <h1>Salasilah Keluarga</h1>
   <div class="tools">
     <span id="st" style="font-size:12px;color:var(--mute)"></span>
+    <button id="fit" title="Muat tree dalam skrin">Fit skrin</button>
     <button id="clr" aria-expanded="false">Warna</button>
   </div>
   <div id="cpanel">
@@ -91,8 +146,8 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
     <button data-m="branch">Cabang</button>
   </div>
 </header>
-<div id="wrap"><div id="stage"></div></div>
-<footer>Hak Cipta Dan Terpelihara S.I.N.A.R.S</footer>
+<div id="wrap"><div id="sizer"><div id="stage"></div></div></div>
+<footer id="foot">Hak Cipta Oleh S.I.N.A.R.S</footer>
 
 <div id="modal">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="v-name">
@@ -150,10 +205,20 @@ select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix
 <script>
 const EDIT_PASS='0000'; /* password untuk buka Edit / tambah orang. Kosongkan '' kalau tak nak kunci. */
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec'; /* optional: tampal URL Apps Script (/exec) kat sini supaya browser baru cuma perlu passphrase. URL ni bukan rahsia, passphrase yang jaga. */
-const KEY='salasilah.v1', W=150, H=52, GX=28, GY=72, CG=36;
+const KEY='salasilah.v1';
+let W=150,H=52,GX=28,GY=72,CG=36;
+/* saiz kad & jarak ikut lebar skrin. return true kalau berubah. */
+function metrics(){
+  const n=innerWidth, m=n<480?[118,48,14,56,18]:(n<860?[132,50,20,64,26]:[150,52,28,72,36]);
+  const ch=m[0]!==W||m[1]!==H;
+  [W,H,GX,GY,CG]=m;
+  const r=document.documentElement.style; r.setProperty('--cw',W+'px'); r.setProperty('--ch',H+'px');
+  return ch;
+}
+metrics();
 const HUE_G=[200,150,35,340,265,15,95,300];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null;
-let colorMode=localStorage.getItem(KEY+'.color')||'none';
+let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
 
 function load(){
   try{
@@ -221,7 +286,7 @@ function layout(){
 function render(){
   const stage=document.getElementById('stage');
   if(!db.people.length){
-    stage.style.width='auto';stage.style.height='auto';
+    stage.style.width='auto';stage.style.height='auto';dim=null;fit();
     stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
     return;
   }
@@ -245,10 +310,21 @@ function render(){
     n.kids.forEach((k,i)=>walk(k,n.d===0?i:br));
   };
   roots.forEach(r=>walk(r,-1));
-  stage.style.width=w+'px'; stage.style.height=(maxY+20)+'px';
+  stage.style.width=w+'px'; stage.style.height=(maxY+20)+'px'; dim={w,h:maxY+20};
   stage.innerHTML=`<svg width="${w}" height="${maxY+20}">${paths.map(p=>`<path${p[1]?' class="d"':''} d="${p[0]}"/>`).join('')}</svg>`+cards.join('');
+  fit();
 }
 
+/* ---------- fit to screen: skala tree ikut saiz skrin (laptop / phone) ---------- */
+function fit(){
+  const z=document.getElementById('sizer'), s=document.getElementById('stage');
+  if(!dim){z.style.width='auto';z.style.height='auto';s.style.transform='';return}
+  const w=document.getElementById('wrap'), aw=w.clientWidth-16,
+        ah=Math.max(200,innerHeight-w.offsetTop-document.getElementById('foot').offsetHeight-50),
+        k=fitOn?Math.min(1,aw/dim.w,ah/dim.h):1;
+  s.style.transform=k<1?`scale(${k})`:''; z.style.width=dim.w*k+'px'; z.style.height=dim.h*k+'px';
+}
+addEventListener('resize',()=>{cancelAnimationFrame(fit.r);fit.r=requestAnimationFrame(fit)});
 /* ---------- warna (optional) ---------- */
 const $=id=>document.getElementById(id);
 function syncColorUI(){
@@ -261,6 +337,8 @@ $('cpanel').addEventListener('click',e=>{
   const b=e.target.closest('[data-m]'); if(!b)return;
   colorMode=b.dataset.m; localStorage.setItem(KEY+'.color',colorMode); syncColorUI(); render();
 });
+$('fit').classList.toggle('act',fitOn);
+$('fit').onclick=()=>{fitOn=!fitOn;localStorage.setItem(KEY+'.fit',fitOn?'1':'0');$('fit').classList.toggle('act',fitOn);fit()};
 syncColorUI();
 if(colorMode!=='none')$('cpanel').classList.add('open');
 
@@ -423,6 +501,10 @@ $('stage').addEventListener('click',e=>{
 });
 
 render();
+let rzT; addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(metrics())render()},120)});
+addEventListener('orientationchange',()=>setTimeout(()=>{metrics();render()},200));
+/* tree lebar dari skrin: mula kat tengah, bukan tersangkut kat tepi kiri */
+(function(){const w=$('wrap');if(w.scrollWidth>w.clientWidth)w.scrollLeft=(w.scrollWidth-w.clientWidth)/2})();
 /* ---------- sync Google Sheets via Apps Script ---------- */
 let cfg={},syncing=false;
 try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
