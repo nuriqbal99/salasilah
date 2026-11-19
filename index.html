@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Salasilah Keluarga</title>
+<style>
+:root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:22px 28px 6px}
+h1{margin:0;font:500 clamp(28px,5vw,44px)/1.1 "Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;letter-spacing:.02em}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:13px;color:var(--ink);background:transparent;border:1px solid var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+button:hover,.btn:hover{background:var(--ink);color:var(--bg)}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#wrap{overflow:auto;padding:24px 0 60px;min-height:60vh}
+#wrap.pad{padding-bottom:380px}
+#stage{position:relative;margin:0 auto}
+svg{position:absolute;left:0;top:0;pointer-events:none}
+svg path{fill:none;stroke:var(--line);stroke-width:1.5}
+svg path.d{stroke-dasharray:4 4}
+.card{position:absolute;width:150px;height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;background:var(--card);border-radius:999px;line-height:1.25;text-align:center;overflow:hidden}
+.card b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.card span{font-size:11px;color:var(--mute);font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.card:hover{background:var(--card);color:var(--ink)}
+.card.pet{border-style:dashed}
+.card.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+#empty{text-align:center;padding:90px 20px;color:var(--mute)}
+#empty p{margin:0 0 18px;font-size:15px}
+#panel{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(620px,100%);background:var(--panel);border:1px solid var(--ink);border-bottom:0;border-radius:18px 18px 0 0;padding:18px 20px 20px;display:none;max-height:75vh;overflow:auto}
+#panel.open{display:block}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--mute);margin-bottom:3px}
+input,textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--mute);border-radius:10px;padding:8px 10px}
+input:focus,textarea:focus{outline:2px solid var(--acc);border-color:transparent}
+textarea{resize:vertical;min-height:54px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts .sp{flex:1}
+.danger{border-color:#b3261e;color:#b3261e}
+.danger:hover{background:#b3261e;color:#fff}
+#toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Salasilah Keluarga</h1>
+  <div class="tools">
+    <span id="st" style="font-size:12px;color:var(--mute)"></span>
+    <button id="syn">Sync</button>
+    <button id="lnk">Salin link family</button>
+    <button id="exp">Export JSON</button>
+    <button id="imp">Import JSON</button>
+    <input id="file" type="file" accept="application/json" hidden>
+  </div>
+</header>
+<div id="wrap"><div id="stage"></div></div>
+
+<section id="panel" aria-label="Butiran orang">
+  <div class="row">
+    <div><label for="f-name">Nama</label><input id="f-name"></div>
+    <div><label for="f-rel">Hubungan (contoh: Ayah, Anak sulung)</label><input id="f-rel"></div>
+  </div>
+  <div class="row">
+    <div><label for="f-born">Tarikh lahir</label><input id="f-born" type="date"></div>
+    <div><label for="f-note">Nota</label><textarea id="f-note"></textarea></div>
+  </div>
+  <div class="acts">
+    <button id="a-child">+ Anak</button>
+    <button id="a-spouse">+ Pasangan</button>
+    <button id="a-parent">+ Mak/Ayah</button>
+    <button id="a-pet">+ Haiwan</button>
+    <span class="sp"></span>
+    <button id="a-del" class="danger">Padam</button>
+    <button id="a-close">Tutup</button>
+  </div>
+</section>
+<div id="toast"></div>
+
+<script>
+const KEY='salasilah.v1', W=150, H=52, GX=28, GY=72, CG=36;
+let db=load(), sel=null, placed=new Set();
+
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY));
+    if(d&&Array.isArray(d.people)) return norm(d);
+  }catch(e){}
+  return {people:[],tomb:{}};
+}
+function norm(d){
+  const ids=new Set(d.people.map(p=>p.id)); d.tomb=d.tomb||{};
+  d.people.forEach(p=>{
+    p.updatedAt=p.updatedAt||1; p.name=p.name||''; p.rel=p.rel||''; p.born=p.born||''; p.note=p.note||'';
+    p.parents=(p.parents||[]).filter(x=>ids.has(x));
+    p.spouse=ids.has(p.spouse)?p.spouse:null; p.pet=!!p.pet;
+  });
+  return d;
+}
+function save(push=true){
+  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Gagal simpan. Export JSON sekarang.')}
+  if(push&&typeof cfg!=='undefined'&&cfg.url){clearTimeout(save.t);save.t=setTimeout(sync,1500)}
+}
+const uid=()=>Math.random().toString(36).slice(2,9);
+const P=id=>db.people.find(p=>p.id===id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2200)}
+
+/* ---------- layout: satu generasi satu baris, pasangan sebelah-menyebelah ---------- */
+function build(p,d){
+  placed.add(p.id);
+  const sp=p.spouse&&P(p.spouse), members=[p];
+  if(sp&&!placed.has(sp.id)){members.push(sp);placed.add(sp.id)}
+  const ids=members.map(m=>m.id);
+  const ch=db.people.filter(c=>!placed.has(c.id)&&c.parents.some(x=>ids.includes(x)))
+    .sort((a,b)=>a.pet-b.pet);
+  const n={members,d,kids:[]};
+  ch.forEach(c=>{if(!placed.has(c.id))n.kids.push(build(c,d+1))});
+  n.own=members.length*W+(members.length-1)*CG;
+  n.kw=n.kids.reduce((a,k)=>a+k.w,0)+Math.max(0,n.kids.length-1)*GX;
+  n.w=Math.max(n.own,n.kw);
+  return n;
+}
+function place(n,x0){
+  n.x=x0+(n.w-n.own)/2; n.y=n.d*(H+GY);
+  let x=x0+(n.w-n.kw)/2;
+  n.kids.forEach(k=>{place(k,x);x+=k.w+GX});
+}
+function layout(){
+  placed=new Set(); const roots=[];
+  const isRoot=p=>!p.parents.length&&!(p.spouse&&P(p.spouse)&&P(p.spouse).parents.length);
+  db.people.forEach(p=>{if(!placed.has(p.id)&&isRoot(p))roots.push(build(p,0))});
+  db.people.forEach(p=>{if(!placed.has(p.id))roots.push(build(p,0))});
+  let x=40; roots.forEach(r=>{place(r,x);x+=r.w+70});
+  return {roots,w:Math.max(x-70+40,300)};
+}
+
+/* ---------- render ---------- */
+function render(){
+  const stage=document.getElementById('stage');
+  if(!db.people.length){
+    stage.style.width='auto';stage.style.height='auto';
+    stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button></div>';
+    return;
+  }
+  const {roots,w}=layout(), cards=[], paths=[]; let maxY=0;
+  const walk=n=>{
+    n.members.forEach((m,i)=>{
+      const x=n.x+i*(W+CG);
+      cards.push(`<button class="card${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px"><b>${esc(m.name||'Tanpa nama')}</b><span>${esc(m.rel)}</span></button>`);
+    });
+    maxY=Math.max(maxY,n.y+H);
+    const two=n.members.length>1;
+    if(two)paths.push([`M${n.x+W} ${n.y+H/2}H${n.x+W+CG}`,0]);
+    if(n.kids.length){
+      const ox=two?n.x+W+CG/2:n.x+W/2, oy=two?n.y+H/2:n.y+H, by=n.y+H+GY/2;
+      const xs=n.kids.map(k=>k.x+W/2);
+      paths.push([`M${ox} ${oy}V${by}`,0]);
+      paths.push([`M${Math.min(ox,...xs)} ${by}H${Math.max(ox,...xs)}`,0]);
+      n.kids.forEach(k=>paths.push([`M${k.x+W/2} ${by}V${k.y}`,k.members[0].pet]));
+    }
+    n.kids.forEach(walk);
+  };
+  roots.forEach(walk);
+  stage.style.width=w+'px'; stage.style.height=(maxY+20)+'px';
+  stage.innerHTML=`<svg width="${w}" height="${maxY+20}">${paths.map(p=>`<path${p[1]?' class="d"':''} d="${p[0]}"/>`).join('')}</svg>`+cards.join('');
+}
+
+/* ---------- panel ---------- */
+const $=id=>document.getElementById(id);
+function openPanel(id){
+  sel=id; const p=P(id); if(!p)return closePanel();
+  $('f-name').value=p.name; $('f-rel').value=p.rel; $('f-born').value=p.born; $('f-note').value=p.note;
+  $('a-spouse').hidden=!!p.spouse||p.pet;
+  $('a-parent').hidden=p.parents.length>0||p.pet;
+  $('a-child').hidden=p.pet; $('a-pet').hidden=p.pet;
+  $('panel').classList.add('open'); $('wrap').classList.add('pad'); render();
+}
+function closePanel(){sel=null;$('panel').classList.remove('open');$('wrap').classList.remove('pad');render()}
+function addPerson(o){
+  const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',parents:[],spouse:null,pet:false},o);
+  db.people.push(p); return p;
+}
+function focusName(){const e=$('f-name');e.focus();e.select()}
+function after(p){save();openPanel(p.id);focusName()}
+
+['name','rel','born','note'].forEach(k=>$('f-'+k).addEventListener('input',e=>{
+  const p=P(sel); if(!p)return; p[k]=e.target.value; p.updatedAt=Date.now(); save(); render();
+}));
+$('a-child').onclick=()=>{const p=P(sel),sp=p.spouse&&P(p.spouse);after(addPerson({parents:sp?[p.id,sp.id]:[p.id],rel:'Anak'}))};
+$('a-pet').onclick=()=>{const p=P(sel);after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}))};
+$('a-spouse').onclick=()=>{const p=P(sel),n=addPerson({spouse:p.id,rel:'Pasangan'});p.spouse=n.id;p.updatedAt=Date.now();after(n)};
+$('a-parent').onclick=()=>{const p=P(sel),n=addPerson({rel:'Mak/Ayah'});p.parents=[n.id];p.updatedAt=Date.now();after(n)};
+$('a-close').onclick=closePanel;
+$('a-del').onclick=()=>{
+  const p=P(sel); if(!p)return;
+  if(!confirm('Padam '+(p.name||'orang ni')+'?'))return;
+  let rm=new Set([p.id]);
+  if(db.people.some(c=>c.parents.includes(p.id))&&confirm('Dia ada anak.\nOK = padam semua keturunan sekali.\nCancel = simpan anak, putus link je.')){
+    let grew=true;
+    while(grew){grew=false;db.people.forEach(c=>{
+      if(!rm.has(c.id)&&c.parents.some(x=>rm.has(x))){rm.add(c.id);grew=true}
+      const s=c.spouse&&P(c.spouse);
+      if(rm.has(c.id)&&s&&!s.parents.length&&!rm.has(s.id)){rm.add(s.id);grew=true}
+    })}
+  }
+  const now=Date.now(); rm.forEach(id=>db.tomb[id]=now);
+  db.people=db.people.filter(x=>!rm.has(x.id));
+  db.people.forEach(x=>{if(x.parents.some(i=>rm.has(i))||rm.has(x.spouse))x.updatedAt=now});
+  norm(db); save(); closePanel(); toast('Dipadam');
+};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel)closePanel()});
+$('stage').addEventListener('click',e=>{
+  if(e.target.id==='first'){const p=addPerson({name:'Aku',rel:'Aku'});return after(p)}
+  const c=e.target.closest('.card'); if(c)openPanel(c.dataset.id);
+});
+
+/* ---------- export / import ---------- */
+$('exp').onclick=()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
+  a.download='salasilah-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result); if(!Array.isArray(d.people))throw 0;
+      if(!confirm('Ganti semua data sekarang dengan '+d.people.length+' orang dari fail ni?'))return;
+      d.people.forEach(p=>p.updatedAt=Date.now()); d.tomb={}; db=norm(d); save(); closePanel(); toast('Import siap');
+    }catch(x){toast('Fail tak sah')}
+  };
+  r.readAsText(f); e.target.value='';
+};
+render();
+/* ---------- sync Google Sheets via Apps Script ---------- */
+let cfg={},syncing=false;
+try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
+(function(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get('u')&&h.get('k')){
+    cfg={url:h.get('u'),key:h.get('k')};
+    localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg));
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+})();
+const st=t=>$('st').textContent=t;
+const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,spouse:p.spouse||'',pet:p.pet,updatedAt:p.updatedAt});
+function merge(rows){
+  rows.forEach(r=>{
+    const t=Number(r.updatedAt)||0, l=P(r.id);
+    if(r.deleted==='1'){
+      if(!l||l.updatedAt<=t){db.tomb[r.id]=t;db.people=db.people.filter(x=>x.id!==r.id)}
+      return;
+    }
+    if(db.tomb[r.id]&&db.tomb[r.id]>=t)return;
+    if(l&&l.updatedAt>=t)return;
+    const n={id:r.id,name:r.name,rel:r.rel,born:r.born,note:r.note,parents:r.parents?r.parents.split(','):[],spouse:r.spouse||null,pet:r.pet==='1',updatedAt:t};
+    if(l)Object.assign(l,n);else db.people.push(n);
+  });
+  norm(db);
+}
+async function sync(){
+  if(!cfg.url||syncing)return; syncing=true; st('Sync...');
+  try{
+    const rows=db.people.map(rowOut).concat(Object.keys(db.tomb).map(id=>({id,deleted:1,updatedAt:db.tomb[id]})));
+    const r=await fetch(cfg.url,{method:'POST',body:JSON.stringify({key:cfg.key,rows})});
+    const j=await r.json(); if(j.error)throw new Error(j.error);
+    merge(j.rows); save(false);
+    if(sel&&!P(sel))closePanel(); else render();
+    st('Sync '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){st('Sync gagal: '+e.message)}
+  syncing=false;
+}
+$('syn').onclick=()=>{
+  const u=prompt('URL web app Apps Script (kosongkan = putuskan sync)',cfg.url||''); if(u===null)return;
+  if(!u.trim()){cfg={};localStorage.removeItem(KEY+'.cfg');return st('Offline')}
+  const k=prompt('Passphrase family',cfg.key||''); if(k===null)return;
+  cfg={url:u.trim(),key:k}; localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg)); sync();
+};
+$('lnk').onclick=()=>{
+  if(!cfg.url)return toast('Setup Sync dulu');
+  if(location.protocol==='file:')return toast('Buka dari link GitHub dulu, baru salin link');
+  const l=location.origin+location.pathname+'#u='+encodeURIComponent(cfg.url)+'&k='+encodeURIComponent(cfg.key);
+  navigator.clipboard.writeText(l).then(()=>toast('Link disalin. Hantar kat family'),()=>prompt('Salin link ni',l));
+};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+setInterval(()=>{if(!document.hidden)sync()},30000);
+st(cfg.url?'':'Offline');
+if(cfg.url)sync();
+</script>
+</body>
+</html>
