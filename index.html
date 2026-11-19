@@ -80,11 +80,6 @@ textarea{resize:vertical;min-height:70px}
   <div class="tools">
     <span id="st" style="font-size:12px;color:var(--mute)"></span>
     <button id="clr" aria-expanded="false">Warna</button>
-    <button id="syn">Sync</button>
-    <button id="lnk">Salin link family</button>
-    <button id="exp">Export JSON</button>
-    <button id="imp">Import JSON</button>
-    <input id="file" type="file" accept="application/json" hidden>
   </div>
   <div id="cpanel">
     <span>Warna ikut:</span>
@@ -135,6 +130,7 @@ textarea{resize:vertical;min-height:70px}
 <div id="toast"></div>
 
 <script>
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbzRRMYl0-q-jIpnEkRj9ZYmgc9IiebSKnJE1qQWO8vHhrw03mj7cQjXtikJ1PR32kemFg/exec'; /* optional: tampal URL Apps Script (/exec) kat sini supaya browser baru cuma perlu passphrase. URL ni bukan rahsia, passphrase yang jaga. */
 const KEY='salasilah.v1', W=150, H=52, GX=28, GY=72, CG=36;
 const HUE_G=[200,150,35,340,265,15,95,300];
 let db=load(), sel=null, mode='view', placed=new Set();
@@ -158,7 +154,7 @@ function norm(d){
   return d;
 }
 function save(push=true){
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Gagal simpan. Export JSON sekarang.')}
+  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Gagal simpan dalam browser ni.')}
   if(push&&typeof cfg!=='undefined'&&cfg.url){clearTimeout(save.t);save.t=setTimeout(sync,1500)}
 }
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -201,7 +197,7 @@ function render(){
   const stage=document.getElementById('stage');
   if(!db.people.length){
     stage.style.width='auto';stage.style.height='auto';
-    stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button></div>';
+    stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
     return;
   }
   const {roots,w}=layout(), cards=[], paths=[]; let maxY=0;
@@ -290,7 +286,7 @@ function after(p){save();openPanel(p.id,'edit')}
   const p=P(sel); if(!p)return; p[k]=e.target.value; p.updatedAt=Date.now(); save(); render();
 }));
 $('a-edit').onclick=()=>openPanel(sel,'edit');
-$('e-done').onclick=()=>openPanel(sel,'view');
+$('e-done').onclick=()=>{clearTimeout(save.t);openPanel(sel,'view');sync()};
 $('a-child').onclick=()=>{const p=P(sel),sp=p.spouse&&P(p.spouse);after(addPerson({parents:sp?[p.id,sp.id]:[p.id],rel:'Anak'}))};
 $('a-pet').onclick=()=>{const p=P(sel);after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}))};
 $('a-spouse').onclick=()=>{const p=P(sel),n=addPerson({spouse:p.id,rel:'Pasangan'});p.spouse=n.id;p.updatedAt=Date.now();after(n)};
@@ -327,29 +323,11 @@ document.addEventListener('keydown',e=>{
   if(mode==='edit')openPanel(sel,'view'); else closePanel();
 });
 $('stage').addEventListener('click',e=>{
+  if(e.target.id==='conn')return setupSync();
   if(e.target.id==='first'){const p=addPerson({name:'Aku',rel:'Aku'});return after(p)}
   const c=e.target.closest('.card'); if(c)openPanel(c.dataset.id,'view');
 });
 
-/* ---------- export / import ---------- */
-$('exp').onclick=()=>{
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
-  a.download='salasilah-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href);
-};
-$('imp').onclick=()=>$('file').click();
-$('file').onchange=e=>{
-  const f=e.target.files[0]; if(!f)return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result); if(!Array.isArray(d.people))throw 0;
-      if(!confirm('Ganti semua data sekarang dengan '+d.people.length+' orang dari fail ni?'))return;
-      d.people.forEach(p=>p.updatedAt=Date.now()); d.tomb={}; db=norm(d); save(); closePanel(); toast('Import siap');
-    }catch(x){toast('Fail tak sah')}
-  };
-  r.readAsText(f); e.target.value='';
-};
 render();
 /* ---------- sync Google Sheets via Apps Script ---------- */
 let cfg={},syncing=false;
@@ -362,6 +340,7 @@ try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
     history.replaceState(null,'',location.pathname+location.search);
   }
 })();
+if(!cfg.url&&DEFAULT_URL){cfg={url:DEFAULT_URL,key:''};localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg))}
 const st=t=>$('st').textContent=t;
 const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,spouse:p.spouse||'',pet:p.pet,g:p.g||'',updatedAt:p.updatedAt});
 function merge(rows){
@@ -390,21 +369,14 @@ async function sync(){
   }catch(e){st('Sync gagal: '+e.message)}
   syncing=false;
 }
-$('syn').onclick=()=>{
-  const u=prompt('URL web app Apps Script (kosongkan = putuskan sync)',cfg.url||''); if(u===null)return;
+function setupSync(){
+  const u=prompt('URL web app Apps Script (kosongkan = putuskan sync)',cfg.url||DEFAULT_URL); if(u===null)return;
   if(!u.trim()){cfg={};localStorage.removeItem(KEY+'.cfg');return st('Offline')}
-  const k=prompt('Passphrase family',cfg.key||''); if(k===null)return;
-  cfg={url:u.trim(),key:k}; localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg)); sync();
-};
-$('lnk').onclick=()=>{
-  if(!cfg.url)return toast('Setup Sync dulu');
-  if(location.protocol==='file:')return toast('Buka dari link GitHub dulu, baru salin link');
-  const l=location.origin+location.pathname+'#u='+encodeURIComponent(cfg.url)+'&k='+encodeURIComponent(cfg.key);
-  navigator.clipboard.writeText(l).then(()=>toast('Link disalin. Hantar kat family'),()=>prompt('Salin link ni',l));
-};
+  cfg={url:u.trim(),key:cfg.key||''}; localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg)); sync();
+}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
 setInterval(()=>{if(!document.hidden)sync()},30000);
-st(cfg.url?'':'Offline');
+st(cfg.url?'':'Offline (data dalam browser ni je)');
 if(cfg.url)sync();
 </script>
 </body>
