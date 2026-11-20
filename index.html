@@ -303,16 +303,16 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
 </head>
 <body>
 <header>
-  <h1>Salasilah Keluarga</h1>
+  <h1>Salasilah S.I.N.A.R.S</h1>
   <div class="tools">
     <span id="st" style="font-size:12px;color:var(--mute)"></span>
-    <button id="fit" title="Muat tree dalam skrin">Fit skrin</button>
+    <button id="fit" title="Muat tree dalam skrin"></button>
     <button id="clr" aria-expanded="false">Warna</button>
     <button id="dm" aria-pressed="false" title="Tukar mod gelap">🌙 Dark: Off</button>
   </div>
   <div id="cpanel">
-    <span>Warna ikut:</span>
-    <button data-m="none">Tiada</button>
+    <span>Warna:</span>
+    <button data-m="none">Normal</button>
     <button data-m="gen">Generasi</button>
     <button data-m="branch">Cabang</button>
   </div>
@@ -501,7 +501,7 @@ function render(){
   const stage=document.getElementById('stage');
   if(!db.people.length){
     stage.style.width='100%';stage.style.height='100%';dim=null;fit();
-    stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
+    stage.innerHTML='<div id="empty"><p>Memuat Data...</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
     return;
   }
   const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[]; let maxY=0;
