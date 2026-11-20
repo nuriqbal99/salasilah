@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Salasilah S.I.N.A.R.S</title>
+<title>Salasilah Keluarga</title>
 <style>
 :root{
   --bg:#f4ede0;--ink:#2b2722;--card:#fffdf9;--mute:#7a7266;--acc:#1b6b66;--panel:#fcf9f2;--line:#2b2722;
@@ -39,7 +39,6 @@ body{
   background-attachment:fixed;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
 }
-/* Latar ilustrasi salasilah keluarga halus */
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.09;
   background-repeat:no-repeat;background-position:center 62%;background-size:min(920px,95vw) auto;
@@ -51,7 +50,6 @@ header{display:flex;flex-direction:column;align-items:center;text-align:center;g
 h1{margin:0;width:100%;text-align:center;font:600 clamp(26px,4.5vw,48px)/1.1 "Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;letter-spacing:.02em;text-shadow:0 2px 10px rgba(0,0,0,.12)}
 .tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
 
-/* Butang gaya 3D */
 button,.btn{
   font:inherit;font-weight:600;font-size:13px;color:var(--ink);
   background:var(--btn-bg);
@@ -73,7 +71,6 @@ button.act:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb
 #cpanel{display:none;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:12px;color:var(--mute);margin-top:2px}
 #cpanel.open{display:flex}
 
-/* Kanvas interaktif macam Google Maps */
 #wrap{
   flex:1 1 auto;min-height:0;width:100%;overflow:hidden;position:relative;
   cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none
@@ -85,7 +82,6 @@ svg path{fill:none;stroke:var(--acc);stroke-width:2.2;stroke-linecap:round;strok
 svg path.d{stroke-dasharray:1 7;stroke-width:3}
 @keyframes flow{to{stroke-dashoffset:-13}}
 
-/* Kad 3D dengan gradient dan shadow */
 .card{
   position:absolute;width:var(--cw,150px);height:var(--ch,52px);
   display:flex;flex-direction:column;justify-content:center;align-items:center;
@@ -124,7 +120,6 @@ svg path.d{stroke-dasharray:1 7;stroke-width:3}
 #empty p{margin:0 0 18px;font-size:15px;line-height:1.5}
 #empty button{margin:4px}
 
-/* popup */
 #modal{--ah:170;position:fixed;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
 #modal.open{display:flex;animation:fade .18s ease-out}
 .sheet{
@@ -167,7 +162,6 @@ textarea{resize:vertical;min-height:70px}
 .acts button{min-height:38px}
 #lock input{margin-top:14px}
 
-/* Butang danger 3D */
 .danger{
   background:linear-gradient(180deg,#fff5f5,#fbd5d5);
   border-color:#c93b33;color:#9b1c1c;
@@ -179,7 +173,6 @@ textarea{resize:vertical;min-height:70px}
   .danger:hover{background:linear-gradient(180deg,#c93b33,#9e221b);color:#fff}
 }
 
-/* Panel pilihan padam */
 #del-box{
   margin-top:16px;padding:16px;border-radius:18px;
   background:linear-gradient(160deg,rgba(179,38,30,.12),rgba(179,38,30,.05));
@@ -244,14 +237,14 @@ textarea{resize:vertical;min-height:70px}
     <button id="clr" aria-expanded="false">Warna</button>
   </div>
   <div id="cpanel">
-    <span>Kategori:</span>
-    <button data-m="none">Biasa</button>
+    <span>Warna ikut:</span>
+    <button data-m="none">Tiada</button>
     <button data-m="gen">Generasi</button>
-    <button data-m="branch">Kelompok</button>
+    <button data-m="branch">Cabang</button>
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
-<footer id="foot">Hak Cipta & Terpelihara (S.I.N.A.R.S)</footer>
+<footer id="foot">Hak Cipta Oleh S.I.N.A.R.S</footer>
 
 <div id="modal">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="v-name">
@@ -338,7 +331,6 @@ const HUE_G=[200,150,35,340,265,15,95,300];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null, editSnap=null, isNewEntry=false;
 let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
 
-/* Kamera interaktif macam Google Maps (panX, panY, scale) */
 let cam={x:0,y:0,k:1,manual:false};
 
 function applyCam(){
@@ -380,6 +372,7 @@ function norm(d){
     p.g=(p.g==='A'||p.g==='M')?p.g:'';
     p.ord=/^([1-9]|10)$/.test(String(p.ord||''))?String(p.ord):'';
     p.parents=(p.parents||[]).filter(x=>ids.has(x));
+    p.inLawParents=(p.inLawParents||[]).filter(x=>ids.has(x)&&!p.parents.includes(x));
     p.spouse=ids.has(p.spouse)?p.spouse:null; p.pet=!!p.pet;
   });
   const pid=new Set(); d.people.forEach(p=>p.parents.forEach(x=>pid.add(x)));
@@ -541,7 +534,10 @@ function openPanel(id,m='view',isNew=false){
   add('Lahir',fmtDate(p.born));
   const names=a=>a.map(x=>x.name||'Tanpa nama').join(', ');
   const sp=p.spouse&&P(p.spouse);
-  const mertua=(!par.length&&sp)?sp.parents.map(P).filter(Boolean):[];
+  const inLawIds=(p.inLawParents||[]).filter(pid=>!p.parents.includes(pid));
+  const mertua=!par.length
+    ? (sp ? sp.parents.map(P).filter(Boolean) : inLawIds.map(P).filter(Boolean))
+    : [];
   if(par.length){
     add('Ayah',names(par.filter(x=>x.g==='A'))||'—');
     add('Mak',names(par.filter(x=>x.g==='M'))||'—');
@@ -568,7 +564,7 @@ function openPanel(id,m='view',isNew=false){
 }
 function closePanel(){sel=null;pending=null;editSnap=null;isNewEntry=false;$('lock').hidden=true;$('del-box').hidden=true;$('modal').classList.remove('open');render()}
 function addPerson(o){
-  const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',g:'',ord:'',parents:[],spouse:null,pet:false},o);
+  const p=Object.assign({id:uid(),updatedAt:Date.now(),name:'Tanpa nama',rel:'',born:'',note:'',g:'',ord:'',parents:[],inLawParents:[],spouse:null,pet:false},o);
   db.people.push(p); return p;
 }
 function focusName(){const e=$('f-name');e.focus();e.select()}
@@ -636,14 +632,29 @@ $('a-pet').onclick=()=>gate(()=>{
   const p=P(sel), snap=JSON.stringify(db);
   after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}),snap);
 });
+
+/* Tambah pasangan: jika p ada inLawParents (mertua yang tersimpan bila pasangan lama dipadam), auto sambungkan pasangan baru ke mertua asal */
 $('a-spouse').onclick=()=>gate(()=>{
   const p=P(sel), snap=JSON.stringify(db), g=p.g==='M'?'A':(p.g==='A'?'M':'');
   const kids=db.people.filter(c=>!c.pet&&c.parents.length===1&&c.parents[0]===p.id);
-  const n=addPerson({spouse:p.id,g,rel:p.parents.length?'Menantu':((kids.length&&g)?(g==='A'?'Ayah':'Mak'):'Pasangan')});
-  const now=Date.now(); p.spouse=n.id; p.updatedAt=now;
+  const restoredParents=(p.inLawParents||[]).filter(pid=>P(pid));
+  const n=addPerson({
+    spouse:p.id,
+    g,
+    parents:restoredParents,
+    rel:restoredParents.length?'Anak':(p.parents.length?'Menantu':((kids.length&&g)?(g==='A'?'Ayah':'Mak'):'Pasangan'))
+  });
+  const now=Date.now();
+  p.spouse=n.id;
+  p.inLawParents=[];
+  p.updatedAt=now;
   kids.forEach(c=>{c.parents.push(n.id);c.updatedAt=now});
+  if(restoredParents.length){
+    toast('Auto sambung ke parent/mertua asal');
+  }
   after(n,snap);
 });
+
 function addParent(g){
   const p=P(sel), snap=JSON.stringify(db), ps=p.spouse&&P(p.spouse), men=!p.parents.length&&ps&&ps.parents.length>0;
   const n=addPerson({g,rel:men?(g==='A'?'Ayah mertua':'Mak mertua'):(g==='A'?'Ayah':'Mak'),name:g==='A'?'Nama ayah':'Nama mak'});
@@ -659,7 +670,7 @@ $('a-mother').onclick=()=>gate(()=>addParent('M'));
 $('a-close').onclick=closePanel;
 $('modal').addEventListener('click',e=>{if(e.target.id==='modal'){if(mode==='edit')cancelEdit();else closePanel()}});
 
-/* Pilihan padam berstruktur dalam modal */
+/* Padam: putuskan link parent individu yang dipadam, tetapi kekalkan relation menantu/mertua pada pasangan yang masih ada */
 function executeDelete(includeDescendants){
   const p=P(sel); if(!p)return;
   let rm=new Set([p.id]);
@@ -671,11 +682,35 @@ function executeDelete(includeDescendants){
       if(rm.has(c.id)&&s&&!s.parents.length&&!rm.has(s.id)){rm.add(s.id);grew=true}
     })}
   }
-  const now=Date.now(); rm.forEach(id=>db.tomb[id]=now);
+  const now=Date.now();
+
+  // Sebelum buang individu yang dipadam, simpan parent mereka pada pasangan yang kekal hidup
+  rm.forEach(delId=>{
+    const delPerson=P(delId);
+    if(!delPerson)return;
+    const sp=delPerson.spouse&&P(delPerson.spouse);
+    if(sp && !rm.has(sp.id) && delPerson.parents.length){
+      const keepParents=delPerson.parents.filter(pid=>!rm.has(pid));
+      if(keepParents.length){
+        sp.inLawParents=Array.from(new Set([...(sp.inLawParents||[]),...keepParents]));
+        sp.updatedAt=now;
+      }
+    }
+  });
+
+  rm.forEach(id=>db.tomb[id]=now);
   db.people=db.people.filter(x=>!rm.has(x.id));
-  db.people.forEach(x=>{if(x.parents.some(i=>rm.has(i))||rm.has(x.spouse))x.updatedAt=now});
+  db.people.forEach(x=>{
+    const hadParentLink=x.parents.some(i=>rm.has(i));
+    const hadSpouseLink=rm.has(x.spouse);
+    if(hadParentLink||hadSpouseLink){
+      x.parents=x.parents.filter(i=>!rm.has(i));
+      if(hadSpouseLink)x.spouse=null;
+      x.updatedAt=now;
+    }
+  });
   norm(db); save(); closePanel();
-  toast(includeDescendants?'Dipadam termasuk keturunan':'Individu dipadam');
+  toast(includeDescendants?'Dipadam termasuk keturunan':'Individu dipadam (link mertua dikekalkan)');
 }
 
 $('a-del').onclick=()=>{
@@ -718,7 +753,6 @@ function zoomAt(clientX,clientY,factor){
   const nextK=Math.min(3.5,Math.max(0.25,cam.k*factor));
   if(nextK===cam.k)return;
 
-  // Titik dunia di bawah cursor sebelum skala berubah
   const wx=(sx-cam.x)/cam.k;
   const wy=(sy-cam.y)/cam.k;
 
@@ -803,7 +837,6 @@ function endPointer(e){
     dragState.active=false;
     wrapEl.classList.remove('dragging');
     if(wasMoved){
-      // Halang klik kad terpicu selepas drag
       wrapEl.dataset.justDragged='1';
       setTimeout(()=>delete wrapEl.dataset.justDragged,50);
     }
@@ -838,7 +871,7 @@ try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
 })();
 if(!cfg.url&&DEFAULT_URL){cfg={url:DEFAULT_URL,key:''};localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg))}
 const st=t=>$('st').textContent=t;
-const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,spouse:p.spouse||'',pet:p.pet,g:p.g||'',ord:p.ord||'',updatedAt:p.updatedAt});
+const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,inLawParents:p.inLawParents||[],spouse:p.spouse||'',pet:p.pet,g:p.g||'',ord:p.ord||'',updatedAt:p.updatedAt});
 function merge(rows){
   rows.forEach(r=>{
     const t=Number(r.updatedAt)||0, l=P(r.id);
@@ -848,7 +881,8 @@ function merge(rows){
     }
     if(db.tomb[r.id]&&db.tomb[r.id]>=t)return;
     if(l&&l.updatedAt>=t)return;
-    const n={id:r.id,name:r.name,rel:r.rel,born:r.born,note:r.note,parents:r.parents?r.parents.split(','):[],spouse:r.spouse||null,pet:r.pet==='1',g:r.g||'',ord:r.ord||'',updatedAt:t};
+    const inLaw=Array.isArray(r.inLawParents)?r.inLawParents:(r.inLawParents?String(r.inLawParents).split(',').filter(Boolean):[]);
+    const n={id:r.id,name:r.name,rel:r.rel,born:r.born,note:r.note,parents:r.parents?String(r.parents).split(',').filter(Boolean):[],inLawParents:inLaw,spouse:r.spouse||null,pet:r.pet==='1',g:r.g||'',ord:r.ord||'',updatedAt:t};
     if(l)Object.assign(l,n);else db.people.push(n);
   });
   norm(db);
