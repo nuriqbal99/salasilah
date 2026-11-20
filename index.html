@@ -6,67 +6,63 @@
 <title>Salasilah Keluarga</title>
 <style>
 :root{
-  --bg:#f4ede0;--ink:#2b2722;--card:#fffdf9;--mute:#7a7266;--acc:#1b6b66;--panel:#fcf9f2;--line:#2b2722;
-  --cbg-l:86%;--cfg:#23211d;--csub:#4e4a43;--cg:linear-gradient(145deg,#ffffff,#ece0c8);--bg2:#dfd2b8;
-  --g1:rgba(27,107,102,.25);--g2:rgba(217,148,54,.28);
-  --btn-bg:linear-gradient(180deg,#ffffff,#e7dcc6);
-  --btn-sh:0 3px 0 #b8ab92,0 6px 14px rgba(43,39,34,.16),inset 0 1px 0 rgba(255,255,255,.9);
-  --btn-sh-act:0 1px 0 #b8ab92,0 2px 6px rgba(43,39,34,.2);
-  --card-sh:0 4px 0 rgba(27,107,102,.32),0 10px 20px rgba(43,39,34,.18),inset 0 1px 0 rgba(255,255,255,.85);
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#191816;--ink:#f0ebe0;--card:#262420;--mute:#9e9789;--acc:#57c4bc;--panel:#22201d;--line:#c9c3b6;
-    --cbg-l:25%;--cfg:#f3eee4;--csub:#bfb8aa;--cg:linear-gradient(145deg,#33302b,#211f1c);--bg2:#100f0d;
-    --g1:rgba(87,196,188,.18);--g2:rgba(230,150,70,.15);
-    --btn-bg:linear-gradient(180deg,#34312c,#22201d);
-    --btn-sh:0 3px 0 #0d0c0a,0 6px 16px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1);
-    --btn-sh-act:0 1px 0 #0d0c0a,0 2px 6px rgba(0,0,0,.5);
-    --card-sh:0 4px 0 rgba(10,12,12,.75),0 10px 22px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12);
-  }
+  --bg:#fafcf8;--ink:#233329;--card:#ffffff;--mute:#5b7062;--acc:#25785c;--panel:#ffffff;--line:#2d5a47;
+  --cbg-l:91%;--cfg:#1e2e24;--csub:#4a6152;--cg:linear-gradient(155deg,#ffffff 0%,#f2f8f3 55%,#e4f1e8 100%);--bg2:#e8f2eb;
+  --g1:rgba(64,168,124,.14);--g2:rgba(218,182,110,.16);--g3:rgba(130,196,178,.15);
+  --btn-bg:linear-gradient(180deg,#ffffff 0%,#eef6f0 100%);
+  --btn-sh:0 3px 0 #b7cdbf,0 8px 18px rgba(35,51,41,.11),inset 0 1px 0 rgba(255,255,255,.95);
+  --btn-sh-act:0 1px 0 #b7cdbf,0 2px 6px rgba(35,51,41,.15);
+  --card-sh:0 5px 0 rgba(37,120,92,.24),0 14px 28px rgba(35,51,41,.13),inset 0 1px 0 rgba(255,255,255,.95);
+  --trunk:#5c4532;--trunk2:#7d6047;--leaf:#398c66;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{background:var(--bg2)}
+html{background:var(--bg2);color-scheme:light}
 html,body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body{
   min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative;overflow-x:hidden;
   background:
-    radial-gradient(circle at 12% 0%,var(--g1),transparent 46%),
-    radial-gradient(circle at 92% 18%,var(--g2),transparent 42%),
-    radial-gradient(circle at 50% 100%,var(--g1),transparent 55%),
-    linear-gradient(165deg,var(--bg) 0%,var(--bg2) 100%);
+    radial-gradient(ellipse 68% 52% at 10% 6%,var(--g1),transparent 65%),
+    radial-gradient(ellipse 62% 55% at 92% 14%,var(--g2),transparent 62%),
+    radial-gradient(ellipse 75% 55% at 50% 98%,var(--g3),transparent 68%),
+    linear-gradient(168deg,#fcfdfb 0%,#f3f8f3 48%,#e7f1ea 100%);
   background-attachment:fixed;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
 }
+/* Corak abstrak lembut + siluet dahan pokok organik di latar */
 body::before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.09;
-  background-repeat:no-repeat;background-position:center 62%;background-size:min(920px,95vw) auto;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' fill='none' stroke='%231f6f6b' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M400 560 C395 450, 385 380, 400 290 C415 380, 405 450, 400 560 Z' fill='%231f6f6b' fill-opacity='.25'/%3E%3Cpath d='M398 410 C330 370, 260 330, 170 260'/%3E%3Cpath d='M402 400 C470 360, 540 315, 635 250'/%3E%3Cpath d='M398 330 C350 270, 300 220, 250 150'/%3E%3Cpath d='M402 325 C455 265, 505 215, 560 145'/%3E%3Cpath d='M400 295 C395 220, 405 160, 400 85'/%3E%3Ccircle cx='170' cy='260' r='34' fill='%231f6f6b' fill-opacity='.2'/%3E%3Ccircle cx='635' cy='250' r='34' fill='%231f6f6b' fill-opacity='.2'/%3E%3Ccircle cx='250' cy='150' r='40' fill='%231f6f6b' fill-opacity='.2'/%3E%3Ccircle cx='560' cy='145' r='40' fill='%231f6f6b' fill-opacity='.2'/%3E%3Ccircle cx='400' cy='85' r='46' fill='%231f6f6b' fill-opacity='.2'/%3E%3Ccircle cx='315' cy='225' r='26' fill='%23e0a046' fill-opacity='.25'/%3E%3Ccircle cx='485' cy='220' r='26' fill='%23e0a046' fill-opacity='.25'/%3E%3Cpath d='M320 560 Q400 535 480 560'/%3E%3C/svg%3E");
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
+  background-repeat:no-repeat;background-position:center center;background-size:cover;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' fill='none'%3E%3Cdefs%3E%3CradialGradient id='b1' cx='22%25' cy='28%25' r='45%25'%3E%3Cstop offset='0%25' stop-color='%238fd4b6' stop-opacity='.26'/%3E%3Cstop offset='100%25' stop-color='%238fd4b6' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='b2' cx='78%25' cy='68%25' r='48%25'%3E%3Cstop offset='0%25' stop-color='%23e8cfa0' stop-opacity='.24'/%3E%3Cstop offset='100%25' stop-color='%23e8cfa0' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='1440' height='900' fill='url(%23b1)'/%3E%3Crect width='1440' height='900' fill='url(%23b2)'/%3E%3Cpath d='M-60 660 C240 520, 480 760, 820 590 C1120 440, 1280 640, 1520 510' stroke='%2325785c' stroke-opacity='.09' stroke-width='2.5'/%3E%3Cpath d='M-40 310 C310 430, 560 190, 910 320 C1180 420, 1320 240, 1500 290' stroke='%239b7b4c' stroke-opacity='.08' stroke-width='2'/%3E%3Cpath d='M180 920 C240 680, 420 560, 490 360 C540 220, 470 110, 520 -20' stroke='%2325785c' stroke-opacity='.07' stroke-width='2'/%3E%3Cpath d='M1240 920 C1170 700, 1020 580, 960 390 C910 230, 980 120, 930 -20' stroke='%2325785c' stroke-opacity='.07' stroke-width='2'/%3E%3Ccircle cx='340' cy='210' r='135' stroke='%2325785c' stroke-opacity='.06' stroke-width='1.5'/%3E%3Ccircle cx='1110' cy='640' r='175' stroke='%239b7b4c' stroke-opacity='.06' stroke-width='1.5'/%3E%3Ccircle cx='720' cy='450' r='260' stroke='%2325785c' stroke-opacity='.045' stroke-width='1.5' stroke-dasharray='8 12'/%3E%3C/svg%3E");
 }
 header,#wrap,footer{position:relative;z-index:1}
-footer{text-align:center;padding:14px 16px 20px;font-size:12px;letter-spacing:.1em;color:var(--mute);border-top:1px dashed rgba(128,128,128,.4);margin:0 24px;flex:none}
+footer{text-align:center;padding:12px 16px 18px;font-size:12px;letter-spacing:.1em;color:var(--mute);border-top:1px dashed rgba(37,120,92,.22);margin:0 24px;flex:none}
 header{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:18px 16px 8px;flex:none}
-h1{margin:0;width:100%;text-align:center;font:600 clamp(26px,4.5vw,48px)/1.1 "Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;letter-spacing:.02em;text-shadow:0 2px 10px rgba(0,0,0,.12)}
+h1{
+  margin:0;width:100%;text-align:center;
+  font:600 clamp(26px,4.5vw,48px)/1.1 "Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  letter-spacing:.02em;color:#1b3829;
+  text-shadow:0 2px 12px rgba(37,120,92,.14)
+}
 .tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
 
 button,.btn{
   font:inherit;font-weight:600;font-size:13px;color:var(--ink);
   background:var(--btn-bg);
-  border:1px solid rgba(128,128,128,.45);
+  border:1px solid rgba(37,120,92,.28);
   border-radius:999px;padding:8px 16px;cursor:pointer;
   box-shadow:var(--btn-sh);
-  transition:transform .14s ease,box-shadow .14s ease,filter .15s ease,background .15s ease
+  transition:transform .16s ease,box-shadow .16s ease,filter .15s ease,background .15s ease
 }
-button:hover,.btn:hover{transform:translateY(-2px);filter:brightness(1.04)}
+button:hover,.btn:hover{transform:translateY(-2px);filter:brightness(1.02)}
 button:active{transform:translateY(2px);box-shadow:var(--btn-sh-act)}
 button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 button.act,button.act:hover{
-  background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 85%,#fff),var(--acc));
-  border-color:var(--acc);color:#fff;
-  box-shadow:0 3px 0 color-mix(in srgb,var(--acc) 60%,#000),0 6px 16px rgba(31,111,107,.35),inset 0 1px 0 rgba(255,255,255,.35)
+  background:linear-gradient(180deg,#349674,#226f55);
+  border-color:#1f664e;color:#fff;
+  box-shadow:0 3px 0 #164c3a,0 8px 18px rgba(37,120,92,.28),inset 0 1px 0 rgba(255,255,255,.38)
 }
-button.act:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb,var(--acc) 60%,#000)}
+button.act:active{transform:translateY(2px);box-shadow:0 1px 0 #164c3a}
 
 #cpanel{display:none;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:12px;color:var(--mute);margin-top:2px}
 #cpanel.open{display:flex}
@@ -77,85 +73,117 @@ button.act:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb
 }
 #wrap.dragging{cursor:grabbing}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
-svg{position:absolute;left:0;top:0;pointer-events:none}
-svg path{fill:none;stroke:var(--acc);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:7 6;opacity:.88;animation:flow 1.4s linear infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.15))}
-svg path.d{stroke-dasharray:1 7;stroke-width:3}
-@keyframes flow{to{stroke-dashoffset:-13}}
+svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 
+/* Gaya dahan & akar pokok keluarga organik */
+svg path.branch{
+  fill:none;stroke:url(#woodGrad);stroke-linecap:round;
+  filter:drop-shadow(0 3px 4px rgba(56,40,26,.16));
+}
+svg path.sap{
+  fill:none;stroke:#63c496;stroke-width:2;stroke-linecap:round;
+  stroke-dasharray:6 14;opacity:.75;animation:sapFlow 2.6s linear infinite;
+}
+svg path.spouse-vine{
+  fill:none;stroke:#c47d48;stroke-width:3.2;stroke-linecap:round;
+  filter:drop-shadow(0 2px 3px rgba(80,50,25,.18));
+}
+svg path.d{stroke-dasharray:2 7;stroke-width:2.6;stroke:#5d9c7e}
+svg .node-knot{fill:#7a5b3e;stroke:#f7fbf8;stroke-width:2}
+svg .heart-knot{fill:#d97b54;stroke:#ffffff;stroke-width:1.8}
+svg .leaf-bud{fill:#4ba378;opacity:.88;transform-box:fill-box;transform-origin:center;animation:leafSway 4.2s ease-in-out infinite}
+@keyframes sapFlow{to{stroke-dashoffset:-20}}
+@keyframes leafSway{
+  0%,100%{transform:rotate(-5deg) scale(1)}
+  50%{transform:rotate(6deg) scale(1.08)}
+}
+
+/* Kad terapung & beralun lembut seperti dedaun pokok */
+@keyframes floatCard{
+  0%,100%{translate:0 0px}
+  50%{translate:0 -5px}
+}
 .card{
   position:absolute;width:var(--cw,150px);height:var(--ch,52px);
   display:flex;flex-direction:column;justify-content:center;align-items:center;
   padding:4px 12px;
   background:var(--cg);
-  border:1.5px solid color-mix(in srgb,var(--acc) 75%,#fff);
-  border-radius:18px;line-height:1.2;text-align:center;overflow:hidden;
+  border:1.5px solid rgba(49,142,107,.45);
+  border-radius:20px;line-height:1.2;text-align:center;overflow:hidden;
   box-shadow:var(--card-sh);
-  transition:transform .16s cubic-bezier(.2,.9,.3,1.3),box-shadow .16s,filter .16s
+  animation:floatCard var(--fd,4.6s) ease-in-out var(--fdel,0s) infinite;
+  transition:transform .2s cubic-bezier(.2,.9,.3,1.3),box-shadow .2s,filter .2s
 }
-.card b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.card::after{
+  content:"";position:absolute;top:5px;right:8px;width:7px;height:7px;
+  border-radius:0 7px 0 7px;background:rgba(57,140,102,.32);pointer-events:none
+}
+.card b{font-size:13px;color:#1b3326;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card span{font-size:11px;color:var(--mute);font-weight:500;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
 .card:hover{
-  transform:translateY(-3px) scale(1.03);
-  box-shadow:0 6px 0 rgba(27,107,102,.38),0 14px 26px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.9);
-  z-index:2
+  animation-play-state:paused;
+  transform:translateY(-5px) scale(1.04);
+  box-shadow:0 8px 0 rgba(37,120,92,.3),0 18px 32px rgba(35,51,41,.18),inset 0 1px 0 rgba(255,255,255,1);
+  z-index:3
 }
 .card:active{transform:translateY(2px) scale(.99)}
 .card.c{
-  --cbg:linear-gradient(145deg,hsl(var(--h) 65% calc(var(--cbg-l) + 9%)),hsl(calc(var(--h) + 25) 55% calc(var(--cbg-l) - 4%)));
-  background:var(--cbg);color:var(--cfg);border-color:hsl(var(--h) 50% 45%);
-  box-shadow:0 4px 0 hsl(var(--h) 45% 32% / .45),0 10px 20px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.45)
+  --cbg:linear-gradient(150deg,hsl(var(--h) 72% 96%),hsl(calc(var(--h) + 22) 62% 88%));
+  background:var(--cbg);color:var(--cfg);border-color:hsl(var(--h) 48% 56%);
+  box-shadow:0 5px 0 hsl(var(--h) 42% 45% / .32),0 14px 26px rgba(35,51,41,.14),inset 0 1px 0 rgba(255,255,255,.85)
 }
-.card.c span{color:var(--csub)}
+.card.c b{color:hsl(var(--h) 45% 18%)}
+.card.c span{color:hsl(var(--h) 30% 34%)}
 .card.c:hover{background:var(--cbg);color:var(--cfg)}
-.card.pet{border-style:dashed}
-.card.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc),var(--card-sh)}
+.card.pet{border-style:dashed;border-radius:24px}
+.card.on{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,120,92,.45),var(--card-sh)}
 
 #empty{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   text-align:center;padding:32px 24px;color:var(--mute);width:min(440px,90vw);
-  background:linear-gradient(160deg,var(--panel),color-mix(in srgb,var(--panel) 85%,var(--bg2)));
-  border:1px solid rgba(128,128,128,.35);border-radius:24px;
-  box-shadow:0 16px 40px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.6)
+  background:linear-gradient(160deg,#ffffff,#eff7f1);
+  border:1px solid rgba(37,120,92,.28);border-radius:26px;
+  box-shadow:0 18px 42px rgba(35,51,41,.12),inset 0 1px 0 rgba(255,255,255,.95)
 }
-#empty p{margin:0 0 18px;font-size:15px;line-height:1.5}
+#empty p{margin:0 0 18px;font-size:15px;line-height:1.5;color:var(--ink)}
 #empty button{margin:4px}
 
-#modal{--ah:170;position:fixed;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+#modal{--ah:152;position:fixed;inset:0;background:rgba(28,44,35,.38);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
 #modal.open{display:flex;animation:fade .18s ease-out}
 .sheet{
   position:relative;width:min(540px,100%);max-height:min(88vh,88dvh);overflow:auto;
-  background:linear-gradient(165deg,var(--panel),color-mix(in srgb,var(--panel) 88%,var(--bg2)));
-  border:1px solid rgba(128,128,128,.4);border-radius:24px;padding:28px 22px 20px;
-  box-shadow:0 26px 70px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.5);
+  background:linear-gradient(165deg,#ffffff 0%,#f3f9f4 100%);
+  border:1px solid rgba(37,120,92,.28);border-radius:26px;padding:28px 22px 20px;
+  box-shadow:0 26px 65px rgba(25,45,35,.25),inset 0 1px 0 rgba(255,255,255,.95);
   animation:pop .24s cubic-bezier(.2,.9,.3,1.25)
 }
-.sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,hsl(var(--ah) 70% 48%),hsl(calc(var(--ah) + 60) 70% 54%))}
+.sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,hsl(var(--ah) 62% 46%),hsl(calc(var(--ah) + 52) 64% 52%))}
 .head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.av{width:58px;height:58px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 25px/1 system-ui,sans-serif;color:#fff;background:linear-gradient(145deg,hsl(var(--ah) 70% 50%),hsl(calc(var(--ah) + 50) 65% 36%));box-shadow:0 6px 14px rgba(0,0,0,.28),inset 0 2px 3px rgba(255,255,255,.4)}
+.av{width:58px;height:58px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 25px/1 system-ui,sans-serif;color:#fff;background:linear-gradient(145deg,hsl(var(--ah) 62% 46%),hsl(calc(var(--ah) + 45) 58% 36%));box-shadow:0 6px 14px rgba(25,45,35,.22),inset 0 2px 3px rgba(255,255,255,.45)}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes pop{from{opacity:0;transform:translateY(18px) scale(.92)}to{opacity:1;transform:none}}
-.sheet h2{margin:0 0 2px;font:600 26px/1.15 "Cormorant Garamond","Iowan Old Style",Georgia,serif}
+.sheet h2{margin:0 0 2px;font:600 26px/1.15 "Cormorant Garamond","Iowan Old Style",Georgia,serif;color:#1b3326}
 .sub{color:var(--mute);font-size:13px}
 dl{
   margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px;padding:14px 16px;
-  background:linear-gradient(180deg,rgba(128,128,128,.08),rgba(128,128,128,.14));
-  border:1px solid rgba(128,128,128,.2);border-radius:16px;
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.06)
+  background:linear-gradient(180deg,rgba(37,120,92,.05),rgba(37,120,92,.09));
+  border:1px solid rgba(37,120,92,.18);border-radius:16px;
+  box-shadow:inset 0 2px 6px rgba(35,51,41,.04)
 }
 dt{color:var(--mute);font-weight:500}
-dd{margin:0;white-space:pre-wrap;word-break:break-word}
+dd{margin:0;white-space:pre-wrap;word-break:break-word;color:#1b3326}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 @media (max-width:420px){.row{grid-template-columns:1fr}}
 label{display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px}
 input,textarea,select{
   width:100%;font:inherit;font-size:14px;color:var(--ink);
-  background:linear-gradient(180deg,rgba(0,0,0,.03),transparent);
-  border:1px solid rgba(128,128,128,.55);border-radius:12px;padding:8px 10px;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.07);
+  background:#ffffff;
+  border:1px solid rgba(37,120,92,.35);border-radius:12px;padding:8px 10px;
+  box-shadow:inset 0 2px 4px rgba(35,51,41,.05);
   transition:box-shadow .15s,border-color .15s
 }
-select{background-color:var(--panel)}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 30%,transparent),inset 0 2px 4px rgba(0,0,0,.07)}
+select{background-color:#ffffff}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,120,92,.2),inset 0 2px 4px rgba(35,51,41,.05)}
 textarea{resize:vertical;min-height:70px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .acts .sp{flex:1}
@@ -163,31 +191,26 @@ textarea{resize:vertical;min-height:70px}
 #lock input{margin-top:14px}
 
 .danger{
-  background:linear-gradient(180deg,#fff5f5,#fbd5d5);
-  border-color:#c93b33;color:#9b1c1c;
-  box-shadow:0 3px 0 #a3261f,0 6px 14px rgba(179,38,30,.2),inset 0 1px 0 rgba(255,255,255,.85)
+  background:linear-gradient(180deg,#fff6f6,#fde2e2);
+  border-color:#d14b43;color:#9b1c1c;
+  box-shadow:0 3px 0 #b83b34,0 6px 14px rgba(179,38,30,.15),inset 0 1px 0 rgba(255,255,255,.9)
 }
-.danger:hover{background:linear-gradient(180deg,#d9382e,#b3261e);color:#fff}
-@media (prefers-color-scheme:dark){
-  .danger{background:linear-gradient(180deg,#4a1c1a,#331210);border-color:#d9534f;color:#ffb4b0;box-shadow:0 3px 0 #1f0908,0 6px 14px rgba(0,0,0,.45)}
-  .danger:hover{background:linear-gradient(180deg,#c93b33,#9e221b);color:#fff}
-}
+.danger:hover{background:linear-gradient(180deg,#dc443b,#b82b23);color:#fff}
 
 #del-box{
   margin-top:16px;padding:16px;border-radius:18px;
-  background:linear-gradient(160deg,rgba(179,38,30,.12),rgba(179,38,30,.05));
-  border:1.5px solid rgba(179,38,30,.45);
-  box-shadow:0 8px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.25)
+  background:linear-gradient(160deg,rgba(210,55,45,.09),rgba(210,55,45,.04));
+  border:1.5px solid rgba(210,55,45,.35);
+  box-shadow:0 8px 20px rgba(35,51,41,.08),inset 0 1px 0 rgba(255,255,255,.7)
 }
 #del-box h3{margin:0 0 4px;font-size:16px;color:#b3261e}
-@media (prefers-color-scheme:dark){#del-box h3{color:#ff8a84}}
 #del-box p{margin:0 0 12px;font-size:13px;color:var(--mute)}
 .del-opts{display:flex;flex-direction:column;gap:8px}
 .del-opts button{width:100%;text-align:center}
 
-#toast{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--bg);padding:9px 15px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+#toast{position:fixed;top:14px;right:14px;background:#1d3b2c;color:#f4fbf6;padding:9px 15px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;box-shadow:0 8px 20px rgba(25,45,35,.22)}
 #toast.on{opacity:1}
-@media (prefers-reduced-motion:reduce){#toast,.card,button{transition:none}#modal.open,.sheet,svg path{animation:none}.card:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){#toast,.card,button{transition:none}#modal.open,.sheet,.card,svg path.sap,svg .leaf-bud{animation:none}.card:hover{transform:none}}
 
 @media (max-width:860px){
   header{padding:14px 12px 6px;gap:8px}
@@ -195,7 +218,7 @@ textarea{resize:vertical;min-height:70px}
 }
 
 @media (max-width:600px){
-  .card{padding:4px 8px;border-radius:16px}
+  .card{padding:4px 8px;border-radius:18px}
   .card b{font-size:13.5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
   .card span{font-size:11.5px;margin-top:2px}
   #modal{align-items:flex-end;padding:0}
@@ -313,11 +336,11 @@ textarea{resize:vertical;min-height:70px}
 const EDIT_PASS='0000';
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec';
 const KEY='salasilah.v1';
-let W=150,H=52,GX=28,GY=72,CG=36;
+let W=150,H=52,GX=28,GY=78,CG=36;
 
 function metrics(){
   const n=document.getElementById('wrap')?.clientWidth||innerWidth;
-  const m=n<600?[138,60,14,58,18]:(n<860?[142,54,20,64,26]:[150,52,28,72,36]);
+  const m=n<600?[138,60,14,64,18]:(n<860?[142,54,20,70,26]:[150,52,28,78,36]);
   const ch=m[0]!==W||m[1]!==H||m[2]!==GX||m[3]!==GY||m[4]!==CG;
   [W,H,GX,GY,CG]=m;
   const r=document.documentElement.style;
@@ -327,7 +350,7 @@ function metrics(){
 }
 metrics();
 
-const HUE_G=[200,150,35,340,265,15,95,300];
+const HUE_G=[152,36,205,342,265,18,95,295];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null, editSnap=null, isNewEntry=false;
 let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
 
@@ -417,8 +440,8 @@ function layout(){
   const isRoot=p=>!p.parents.length&&!(p.spouse&&P(p.spouse)&&P(p.spouse).parents.length);
   db.people.forEach(p=>{if(!placed.has(p.id)&&isRoot(p))roots.push(build(p,0))});
   db.people.forEach(p=>{if(!placed.has(p.id))roots.push(build(p,0))});
-  let x=16; roots.forEach(r=>{place(r,x);x+=r.w+GX*2});
-  return {roots,w:Math.max(x-GX*2+16,240)};
+  let x=24; roots.forEach(r=>{place(r,x);x+=r.w+GX*2});
+  return {roots,w:Math.max(x-GX*2+24,260)};
 }
 
 /* ---------- render ---------- */
@@ -430,30 +453,78 @@ function render(){
     stage.innerHTML='<div id="empty"><p>Belum ada sesiapa. Mula dengan diri kau, lepas tu tambah mak ayah, pasangan dan anak.</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
     return;
   }
-  const {roots,w}=layout(), cards=[], paths=[]; let maxY=0;
-  const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?45:HUE_G[br%8]);
+  const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[]; let maxY=0;
+  const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?152:HUE_G[br%8]);
+
   const walk=(n,br)=>{
     n.members.forEach((m,i)=>{
       const x=n.x+i*(W+CG), c=colorMode==='none'?'':' c', h=colorMode==='none'?'':`;--h:${hue(n,br)}`;
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
-      cards.push(`<button class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}</button>`);
+      const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
+      const fdel=(-((i*1.1+n.d*0.85)%4)).toFixed(2)+'s';
+      cards.push(`<button class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}</button>`);
     });
     maxY=Math.max(maxY,n.y+H);
     const two=n.members.length>1;
-    if(two)paths.push([`M${n.x+W} ${n.y+H/2}H${n.x+W+CG}`,0]);
+
+    // Sambungan pasangan melengkung organik seperti ranting bertemu
+    if(two){
+      const sx1=n.x+W, sx2=n.x+W+CG, sy=n.y+H/2;
+      const mx=(sx1+sx2)/2;
+      paths.push([`M${sx1} ${sy} Q${mx} ${sy-7} ${sx2} ${sy}`,'spouse-vine',3.2]);
+      knots.push(`<circle class="heart-knot" cx="${mx}" cy="${sy-3.5}" r="4.5"/>`);
+    }
+
+    // Dahan pokok melengkung organik ke setiap anak
     if(n.kids.length){
-      const ox=two?n.x+W+CG/2:n.x+W/2, oy=two?n.y+H/2:n.y+H, by=n.y+H+GY/2;
-      const xs=n.kids.map(k=>k.x+W/2);
-      paths.push([`M${ox} ${oy}V${by}`,0]);
-      paths.push([`M${Math.min(ox,...xs)} ${by}H${Math.max(ox,...xs)}`,0]);
-      n.kids.forEach(k=>paths.push([`M${k.x+W/2} ${by}V${k.y}`,k.members[0].pet]));
+      const ox=two?n.x+W+CG/2:n.x+W/2;
+      const oy=two?n.y+H/2-2:n.y+H;
+      const trunkW=Math.max(2.4, 5.2 - n.d*0.7);
+      const forkY=n.y+H+GY*0.42;
+
+      // Batang utama turun dari pasangan/induk ke simpang dahan
+      const trunkD=`M${ox} ${oy} C${ox} ${oy+(forkY-oy)*0.55}, ${ox} ${forkY-(forkY-oy)*0.35}, ${ox} ${forkY}`;
+      paths.push([trunkD,'branch',trunkW]);
+      paths.push([trunkD,'sap',2]);
+      knots.push(`<circle class="node-knot" cx="${ox}" cy="${forkY}" r="${Math.max(3,trunkW*0.85)}"/>`);
+
+      // Dahan melengkung ke setiap anak
+      n.kids.forEach((k,idx)=>{
+        const kx=k.x+W/2, ky=k.y;
+        const c1x=ox+(kx-ox)*0.22, c1y=forkY+(ky-forkY)*0.65;
+        const c2x=kx-(kx-ox)*0.12, c2y=forkY+(ky-forkY)*0.32;
+        const dahanD=`M${ox} ${forkY} C${c1x} ${c1y}, ${c2x} ${c2y}, ${kx} ${ky}`;
+        const brW=Math.max(2, trunkW*0.78);
+        paths.push([dahanD, k.members[0].pet?'branch d':'branch', brW]);
+        if(!k.members[0].pet){
+          paths.push([dahanD,'sap',1.8]);
+          // Tunas daun kecil di dahan
+          const lx=(ox+kx)/2, ly=(forkY+ky)/2-2;
+          const rot=kx>=ox?28:-28;
+          leaves.push(`<path class="leaf-bud" style="animation-delay:${-(idx*0.7)}s" d="M${lx} ${ly} C${lx+8} ${ly-9}, ${lx+15} ${ly-3}, ${lx+4} ${ly+4} Z" transform="rotate(${rot} ${lx} ${ly})"/>`);
+        }
+      });
     }
     n.kids.forEach((k,i)=>walk(k,n.d===0?i:br));
   };
   roots.forEach(r=>walk(r,-1));
-  const stageH=maxY+16;
+
+  // Akar pokok lembut di bahagian paling atas (generasi terawal)
+  const rootBases=roots.map(r=>{
+    const rx=r.members.length>1 ? r.x+W+CG/2 : r.x+W/2;
+    const ry=r.y;
+    return `
+      <path class="branch" stroke-width="4" d="M${rx} ${ry} C${rx-6} ${ry-16}, ${rx-24} ${ry-22}, ${rx-38} ${ry-14}"/>
+      <path class="branch" stroke-width="4" d="M${rx} ${ry} C${rx+6} ${ry-16}, ${rx+24} ${ry-22}, ${rx+38} ${ry-14}"/>
+      <path class="branch" stroke-width="2.6" d="M${rx} ${ry-4} C${rx-2} ${ry-20}, ${rx+4} ${ry-28}, ${rx} ${ry-34}"/>
+      <circle class="node-knot" cx="${rx}" cy="${ry}" r="4.5"/>
+    `;
+  }).join('');
+
+  const stageH=maxY+28;
   stage.style.width=w+'px'; stage.style.height=stageH+'px'; dim={w,h:stageH};
-  stage.innerHTML=`<svg width="${w}" height="${stageH}">${paths.map(p=>`<path${p[1]?' class="d"':''} d="${p[0]}"/>`).join('')}</svg>`+cards.join('');
+  const svgDefs=`<defs><linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7c5d41"/><stop offset="55%" stop-color="#4e6e54"/><stop offset="100%" stop-color="#2d7a5b"/></linearGradient></defs>`;
+  stage.innerHTML=`<svg width="${w}" height="${stageH}">${svgDefs}${rootBases}${paths.map(p=>`<path class="${p[1]}" stroke-width="${p[2]}" d="${p[0]}"/>`).join('')}${leaves.join('')}${knots.join('')}</svg>`+cards.join('');
   if(!cam.manual)fit(); else applyCam();
 }
 
@@ -633,7 +704,6 @@ $('a-pet').onclick=()=>gate(()=>{
   after(addPerson({parents:[p.id],pet:true,rel:'Haiwan',name:'Nama haiwan'}),snap);
 });
 
-/* Tambah pasangan: jika p ada inLawParents (mertua yang tersimpan bila pasangan lama dipadam), auto sambungkan pasangan baru ke mertua asal */
 $('a-spouse').onclick=()=>gate(()=>{
   const p=P(sel), snap=JSON.stringify(db), g=p.g==='M'?'A':(p.g==='A'?'M':'');
   const kids=db.people.filter(c=>!c.pet&&c.parents.length===1&&c.parents[0]===p.id);
@@ -670,7 +740,6 @@ $('a-mother').onclick=()=>gate(()=>addParent('M'));
 $('a-close').onclick=closePanel;
 $('modal').addEventListener('click',e=>{if(e.target.id==='modal'){if(mode==='edit')cancelEdit();else closePanel()}});
 
-/* Padam: putuskan link parent individu yang dipadam, tetapi kekalkan relation menantu/mertua pada pasangan yang masih ada */
 function executeDelete(includeDescendants){
   const p=P(sel); if(!p)return;
   let rm=new Set([p.id]);
@@ -684,7 +753,6 @@ function executeDelete(includeDescendants){
   }
   const now=Date.now();
 
-  // Sebelum buang individu yang dipadam, simpan parent mereka pada pasangan yang kekal hidup
   rm.forEach(delId=>{
     const delPerson=P(delId);
     if(!delPerson)return;
