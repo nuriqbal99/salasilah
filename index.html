@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Salasilah Keluarga</title>
+<title>Salasilah S.I.N.A.R.S</title>
 <style>
 :root{--bg:#f6f2ea;--ink:#33312e;--card:#fffdf9;--mute:#857f74;--acc:#1f6f6b;--panel:#fffdf9;--line:#33312e;--cbg-l:86%;--cfg:#2a2926;--csub:#55524c;--cg:linear-gradient(135deg,#fffdf9,#efe6d3);--bg2:#e6dcc6;--g1:rgba(31,111,107,.22);--g2:rgba(224,160,70,.26)}
 @media (prefers-color-scheme:dark){:root{--bg:#1d1c1a;--ink:#ece7dc;--card:#262522;--mute:#9a9487;--acc:#5fc2bb;--panel:#262522;--line:#c9c3b6;--cbg-l:24%;--cfg:#ece7dc;--csub:#b9b3a6;--cg:linear-gradient(135deg,#2c2b28,#363430);--bg2:#141311;--g1:rgba(95,194,187,.16);--g2:rgba(230,150,70,.12)}}
@@ -209,7 +209,7 @@ metrics();
 
 const HUE_G=[200,150,35,340,265,15,95,300];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null;
-let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
+let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0', zoom=null;
 
 function load(){
   try{
@@ -319,15 +319,17 @@ function fit(){
   const aw=Math.max(120,wrap.clientWidth-padX);
   const ah=Math.max(120,wrap.clientHeight-padY);
   let k=1;
-  if(fitOn){
+  if(zoom!==null){
+    k=zoom;
+  }else if(fitOn){
     k=wrap.clientWidth<600
       ? Math.max(0.78, Math.min(1, aw/dim.w))
       : Math.min(1, aw/dim.w, ah/dim.h);
   }
-  s.style.transform=k<1?`scale(${k})`:'';
+  s.style.transform=k!==1?`scale(${k})`:'';
   z.style.width=Math.ceil(dim.w*k)+'px';
   z.style.height=Math.ceil(dim.h*k)+'px';
-  if(wrap.scrollWidth>wrap.clientWidth){
+  if(zoom===null && wrap.scrollWidth>wrap.clientWidth){
     wrap.scrollLeft=Math.max(0,(wrap.scrollWidth-wrap.clientWidth)/2);
   }
 }
@@ -362,6 +364,7 @@ $('cpanel').addEventListener('click',e=>{
 $('fit').classList.toggle('act',fitOn);
 $('fit').onclick=()=>{
   fitOn=!fitOn;
+  zoom=null;
   localStorage.setItem(KEY+'.fit',fitOn?'1':'0');
   $('fit').classList.toggle('act',fitOn);
   fit();
@@ -523,6 +526,32 @@ $('stage').addEventListener('click',e=>{
   if(e.target.id==='first')return gate(()=>{const p=addPerson({name:'Aku',rel:'Aku'});after(p)});
   const c=e.target.closest('.card'); if(c)openPanel(c.dataset.id,'view');
 });
+
+$('wrap').addEventListener('wheel',e=>{
+  if(!dim)return;
+  e.preventDefault();
+  const wrap=$('wrap'), rect=wrap.getBoundingClientRect();
+  const cs=getComputedStyle(wrap);
+  const padX=parseFloat(cs.paddingLeft)||0, padY=parseFloat(cs.paddingTop)||0;
+  const z=document.getElementById('sizer'), s=document.getElementById('stage');
+  const curK=zoom!==null?zoom:(parseFloat((s.style.transform.match(/scale\(([^)]+)\)/)||[])[1])||1);
+  const factor=e.deltaY<0?1.12:1/1.12;
+  const nextK=Math.min(3,Math.max(0.25,curK*factor));
+  if(nextK===curK)return;
+
+  const px=e.clientX-rect.left+wrap.scrollLeft-z.offsetLeft-padX;
+  const py=e.clientY-rect.top+wrap.scrollTop-z.offsetTop-padY;
+  const ratio=nextK/curK;
+
+  zoom=nextK;
+  fitOn=false;
+  localStorage.setItem(KEY+'.fit','0');
+  $('fit').classList.remove('act');
+  fit();
+
+  wrap.scrollLeft=z.offsetLeft+padX+px*ratio-(e.clientX-rect.left);
+  wrap.scrollTop=z.offsetTop+padY+py*ratio-(e.clientY-rect.top);
+},{passive:false});
 
 render();
 
