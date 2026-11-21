@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Salasilah S.I.N.A.R.S</title>
 <script>try{if(localStorage.getItem('salasilah.v1.theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
+<script>(function(){var i=new Image();i.onload=function(){document.documentElement.classList.add('has-bg')};i.src='bg.jpeg'})();</script>
 <style>
 :root{
   --bg:#fafcf8;--ink:#233329;--card:#ffffff;--mute:#5b7062;--acc:#25785c;--panel:#ffffff;--line:#2d5a47;
@@ -110,7 +111,7 @@ svg .leaf-bud{fill:#4ba378;opacity:.88;transform-box:fill-box;transform-origin:c
   padding:4px 12px;
   background:var(--cg);
   border:1.5px solid rgba(49,142,107,.45);
-  border-radius:20px;line-height:1.2;text-align:center;overflow:hidden;
+  border-radius:20px;line-height:1.2;text-align:center;overflow:visible;
   box-shadow:var(--card-sh);
   animation:floatCard var(--fd,4.6s) ease-in-out var(--fdel,0s) infinite;
   transition:transform .2s cubic-bezier(.2,.9,.3,1.3),box-shadow .2s,filter .2s
@@ -299,6 +300,38 @@ html[data-theme=dark] #del-box{background:linear-gradient(160deg,rgba(210,55,45,
 html[data-theme=dark] #del-box h3{color:#ff8f87}
 html[data-theme=dark] #l-err{color:#ff8f87!important}
 html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
+
+/* ---------- Latar bg.jpeg (hanya aktif kalau fail wujud) ---------- */
+html.has-bg body::before{
+  opacity:1;background-repeat:no-repeat;background-position:center center;background-size:cover;
+  background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)),url("bg.jpeg")
+}
+@supports (height:100lvh){html.has-bg body::before{height:100lvh}}
+html.has-bg[data-theme=dark] body::before{opacity:1;background-image:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),url("bg.jpeg")}
+
+/* ---------- Daun kecil bergerak pada setiap kotak ---------- */
+.card{--lf:#4ba378}
+.card.c{--lf:hsl(var(--h) 50% 46%)}
+html[data-theme=dark] .card{--lf:#5fcf9f}
+html[data-theme=dark] .card.c{--lf:hsl(var(--h) 55% 62%)}
+.lf{position:absolute;width:9px;height:9px;pointer-events:none;border-radius:0 100% 0 100%;background:var(--lf);opacity:.8;will-change:transform}
+.lf.a{left:-4px;top:-5px;animation:lfA 5.2s ease-in-out calc(var(--fdel,0s) - 1s) infinite}
+.lf.b{right:-5px;top:38%;width:7px;height:7px;animation:lfB 6.4s ease-in-out calc(var(--fdel,0s) - 2s) infinite}
+.lf.c3{right:3px;top:3px;width:8px;height:8px;opacity:0;animation:lfFall 7.5s ease-in calc(var(--fdel,0s) * 1.7) infinite}
+@keyframes lfA{0%,100%{transform:translate(0,0) rotate(-20deg)}50%{transform:translate(4px,3px) rotate(28deg)}}
+@keyframes lfB{0%,100%{transform:translate(0,0) rotate(15deg)}50%{transform:translate(-3px,5px) rotate(-32deg)}}
+@keyframes lfFall{0%{transform:translate(0,0) rotate(0);opacity:0}12%{opacity:.85}100%{transform:translate(16px,52px) rotate(190deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.lf{animation:none}.lf.c3{display:none}}
+
+/* ---------- Border putus-putus generasi + label ---------- */
+.gband{position:absolute;pointer-events:none;border:1.6px dashed var(--gb,rgba(37,120,92,.5));border-radius:22px;background:var(--gbf,rgba(37,120,92,.045))}
+.glbl{
+  position:absolute;z-index:2;width:143px;height:30px;min-height:0;font-size:16px;padding:0 10px;text-align:center;
+  border-radius:12px;background:var(--panel);color:var(--ink);border:1.5px dashed var(--gb,rgba(37,120,92,.55));box-shadow:none;
+  transform:scale(.7);transform-origin:0 100%;user-select:text;-webkit-user-select:text;touch-action:manipulation
+}
+.glbl::placeholder{color:var(--mute);opacity:.75;font-style:italic}
+.glbl:focus{border-style:solid;box-shadow:0 0 0 3px rgba(37,120,92,.2)}
 </style>
 </head>
 <body>
@@ -315,7 +348,6 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
     <span>Warna:</span>
     <button data-m="none">Normal</button>
     <button data-m="gen">Generasi</button>
-    <button data-m="branch">Cabang</button>
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
@@ -390,6 +422,7 @@ const EDIT_PASS='0000';
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec';
 const KEY='salasilah.v1';
 let W=150,H=52,GX=28,GY=78,CG=36;
+const TOP=38;
 
 function metrics(){
   const n=document.getElementById('wrap')?.clientWidth||innerWidth;
@@ -405,7 +438,7 @@ metrics();
 
 const HUE_G=[152,36,205,342,265,18,95,295];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null, editSnap=null, isNewEntry=false;
-let colorMode=localStorage.getItem(KEY+'.color')||'none', dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
+let colorMode=(localStorage.getItem(KEY+'.color')==='gen'?'gen':'none'), dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
 
 let cam={x:0,y:0,k:1,manual:false};
 
@@ -450,10 +483,10 @@ function load(){
     const d=JSON.parse(localStorage.getItem(KEY));
     if(d&&Array.isArray(d.people)) return norm(d);
   }catch(e){}
-  return {people:[],tomb:{}};
+  return {people:[],tomb:{},gl:{}};
 }
 function norm(d){
-  const ids=new Set(d.people.map(p=>p.id)); d.tomb=d.tomb||{};
+  const ids=new Set(d.people.map(p=>p.id)); d.tomb=d.tomb||{}; d.gl=d.gl||{};
   d.people.forEach(p=>{
     p.updatedAt=p.updatedAt||1; p.name=p.name||''; p.rel=p.rel||''; p.born=p.born||''; p.note=p.note||'';
     p.g=(p.g==='A'||p.g==='M')?p.g:'';
@@ -495,7 +528,7 @@ function build(p,d){
   return n;
 }
 function place(n,x0){
-  n.x=x0+(n.w-n.own)/2; n.y=n.d*(H+GY);
+  n.x=x0+(n.w-n.own)/2; n.y=n.d*(H+GY)+TOP;
   let x=x0+(n.w-n.kw)/2;
   n.kids.forEach(k=>{place(k,x);x+=k.w+GX});
 }
@@ -510,6 +543,8 @@ function layout(){
 
 /* ---------- render ---------- */
 function render(){
+  const ae=document.activeElement;
+  if(ae&&ae.classList&&ae.classList.contains('glbl')){render.pending=1;return}
   metrics();
   const stage=document.getElementById('stage');
   if(!db.people.length){
@@ -517,16 +552,17 @@ function render(){
     stage.innerHTML='<div id="empty"><p>Memuat Data...</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
     return;
   }
-  const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[]; let maxY=0;
+  const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[], depths=new Set(); let maxY=0;
   const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?152:HUE_G[br%8]);
 
   const walk=(n,br)=>{
+    depths.add(n.d);
     n.members.forEach((m,i)=>{
       const x=n.x+i*(W+CG), c=colorMode==='none'?'':' c', h=colorMode==='none'?'':`;--h:${hue(n,br)}`;
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
       const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
       const fdel=(-((i*1.1+n.d*0.85)%4)).toFixed(2)+'s';
-      cards.push(`<button title="${esc(m.name||'')}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}</button>`);
+      cards.push(`<button title="${esc(m.name||'')}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}<i class="lf a"></i><i class="lf b"></i><i class="lf c3"></i></button>`);
     });
     maxY=Math.max(maxY,n.y+H);
     const two=n.members.length>1;
@@ -587,8 +623,15 @@ function render(){
 
   const stageH=maxY+28;
   stage.style.width=w+'px'; stage.style.height=stageH+'px'; dim={w,h:stageH};
+  let bands='',labels='';
+  [...depths].sort((a,b)=>a-b).forEach(d=>{
+    const y=TOP+d*(H+GY), hh=colorMode==='gen'?HUE_G[d%8]:null;
+    const sty=hh===null?'':`;--gb:hsl(${hh} 45% 45% / .6);--gbf:hsl(${hh} 60% 50% / .06)`;
+    bands+=`<div class="gband" style="left:8px;top:${y-10}px;width:${w-16}px;height:${H+20}px${sty}"></div>`;
+    labels+=`<input class="glbl" data-d="${d}" maxlength="24" autocomplete="off" placeholder="+ label" value="${esc((db.gl[d]||{}).t||'')}" style="left:14px;top:${y-43}px${sty}">`;
+  });
   const svgDefs=`<defs><linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7c5d41"/><stop offset="55%" stop-color="#4e6e54"/><stop offset="100%" stop-color="#2d7a5b"/></linearGradient></defs>`;
-  stage.innerHTML=`<svg width="${w}" height="${stageH}">${svgDefs}${rootBases}${paths.map(p=>`<path class="${p[1]}" stroke-width="${p[2]}" d="${p[0]}"/>`).join('')}${leaves.join('')}${knots.join('')}</svg>`+cards.join('');
+  stage.innerHTML=bands+`<svg width="${w}" height="${stageH}">${svgDefs}${rootBases}${paths.map(p=>`<path class="${p[1]}" stroke-width="${p[2]}" d="${p[0]}"/>`).join('')}${leaves.join('')}${knots.join('')}</svg>`+cards.join('')+labels;
   if(!cam.manual)fit(); else applyCam();
 }
 
@@ -799,12 +842,14 @@ $('a-spouse').onclick=()=>gate(()=>{
 
 function addParent(g){
   const p=P(sel), snap=JSON.stringify(db), ps=p.spouse&&P(p.spouse), men=!p.parents.length&&ps&&ps.parents.length>0;
+  const wasTop=!p.parents.length&&!(ps&&ps.parents.length)&&layout().roots.length===1;
   const n=addPerson({g,rel:men?(g==='A'?'Ayah mertua':'Mak mertua'):(g==='A'?'Ayah':'Mak'),name:g==='A'?'Nama ayah':'Nama mak'});
   const key=a=>a.parents.slice().sort().join(','), k=key(p), now=Date.now();
   const sibs=k?db.people.filter(c=>c.id!==p.id&&c.id!==n.id&&!c.pet&&key(c)===k):[];
   const other=p.parents.map(P).filter(Boolean)[0];
   [p,...sibs].forEach(c=>{c.parents.push(n.id);c.updatedAt=now});
   if(other&&!other.spouse){other.spouse=n.id;n.spouse=other.id;other.updatedAt=now}
+  if(wasTop)shiftGL(1);
   after(n,snap);
 }
 $('a-father').onclick=()=>gate(()=>addParent('A'));
@@ -918,7 +963,7 @@ wrapEl.addEventListener('wheel',e=>{
 },{passive:false});
 
 wrapEl.addEventListener('pointerdown',e=>{
-  if(e.target.closest('#empty'))return;
+  if(e.target.closest('#empty')||e.target.closest('.glbl'))return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(pointers.size===1){
     dragState={active:true,moved:false,startX:e.clientX,startY:e.clientY,origX:cam.x,origY:cam.y,pid:e.pointerId};
@@ -996,6 +1041,29 @@ $('stage').addEventListener('click',e=>{
   const c=e.target.closest('.card'); if(c)openPanel(c.dataset.id,'view');
 });
 
+/* ---------- label generasi ---------- */
+function shiftGL(by){
+  const o=db.gl||{}, n={}, now=Date.now();
+  Object.keys(o).forEach(k=>{n[+k+by]={t:o[k].t,u:now}});
+  for(let i=0;i<by;i++)n[i]={t:'',u:now};
+  db.gl=n;
+}
+$('stage').addEventListener('focusin',e=>{
+  const t=e.target; if(!t.classList||!t.classList.contains('glbl')||unlocked||!EDIT_PASS)return;
+  const d=t.dataset.d; t.blur();
+  gate(()=>{closePanel();const el=$('stage').querySelector('.glbl[data-d="'+d+'"]');if(el)el.focus()});
+});
+$('stage').addEventListener('input',e=>{
+  const t=e.target; if(!t.classList||!t.classList.contains('glbl'))return;
+  db.gl[t.dataset.d]={t:t.value.slice(0,24),u:Date.now()}; save();
+});
+$('stage').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('glbl'))e.target.blur();
+});
+$('stage').addEventListener('focusout',e=>{
+  if(e.target.classList&&e.target.classList.contains('glbl')&&render.pending){render.pending=0;setTimeout(render,0)}
+});
+
 render();
 
 /* ---------- sync Google Sheets via Apps Script ---------- */
@@ -1014,7 +1082,9 @@ const st=t=>$('st').textContent=t;
 const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,inLawParents:p.inLawParents||[],spouse:p.spouse||'',pet:p.pet,g:p.g||'',ord:p.ord||'',updatedAt:p.updatedAt});
 function merge(rows){
   rows.forEach(r=>{
-    const t=Number(r.updatedAt)||0, l=P(r.id);
+    const t=Number(r.updatedAt)||0;
+    if(String(r.id).indexOf('__gl_')===0){const k=String(r.id).slice(5);if(!db.gl[k]||db.gl[k].u<t)db.gl[k]={t:String(r.name||''),u:t};return}
+    const l=P(r.id);
     if(r.deleted==='1'){
       if(!l||l.updatedAt<=t){db.tomb[r.id]=t;db.people=db.people.filter(x=>x.id!==r.id)}
       return;
@@ -1030,7 +1100,7 @@ function merge(rows){
 async function sync(){
   if(!cfg.url||syncing)return; syncing=true; st('Sync...');
   try{
-    const rows=db.people.map(rowOut).concat(Object.keys(db.tomb).map(id=>({id,deleted:1,updatedAt:db.tomb[id]})));
+    const rows=db.people.map(rowOut).concat(Object.keys(db.tomb).map(id=>({id,deleted:1,updatedAt:db.tomb[id]}))).concat(Object.keys(db.gl).map(k=>({id:'__gl_'+k,name:db.gl[k].t,rel:'',born:'',note:'',parents:[],inLawParents:[],spouse:'',pet:false,g:'',ord:'',updatedAt:db.gl[k].u})));
     const r=await fetch(cfg.url,{method:'POST',body:JSON.stringify({key:cfg.key,rows})});
     const j=await r.json(); if(j.error)throw new Error(j.error);
     merge(j.rows); save(false);
