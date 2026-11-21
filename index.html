@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Salasilah S.I.N.A.R.S</title>
 <script>try{if(localStorage.getItem('salasilah.v1.theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
+<script>(function(){try{var q=location.search,ua=navigator.userAgent||'',low=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4&&matchMedia('(pointer:coarse)').matches);var ios=/iPhone|iPad|iPod/i.test(ua);var on=!ios&&(/Android/i.test(ua)||low);if(/[?&]lite=1/.test(q))on=true;if(/[?&]lite=0/.test(q))on=false;if(on)document.documentElement.classList.add('lite')}catch(e){}})();</script>
 <script>(function(){var i=new Image();i.onload=function(){document.documentElement.classList.add('has-bg')};i.src='audio/bg.jpg'})();</script>
 <style>
 :root{
@@ -403,6 +404,41 @@ html[data-theme=dark] .card.c.ns{
 html[data-theme=dark] .card.c.ns b{color:#fff}
 html[data-theme=dark] .card.c.ns span{color:hsl(var(--h) 85% 88%)}
 html[data-theme=dark] .card.c.ns::after{background:rgba(255,255,255,.4)}
+
+/* ================= v2.5.8: island header, skrin penuh, phone compact, mod lite (Android) ================= */
+body{height:100vh;height:100dvh;overflow:hidden}
+#wrap{position:fixed;inset:0;z-index:1;flex:none;min-height:0}
+header{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:0;right:0;margin:0 auto;z-index:6;width:fit-content;max-width:calc(100% - 20px);-webkit-backdrop-filter:none;backdrop-filter:none}
+footer{position:fixed;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);z-index:2;margin:0;padding:6px 12px 8px;border:0;background:none;pointer-events:none;text-shadow:0 1px 3px rgba(255,255,255,.85)}
+html[data-theme=dark] footer{text-shadow:0 1px 3px rgba(0,0,0,.8)}
+html input.glbl{transform:scale(var(--ls,.95));-webkit-backdrop-filter:none;backdrop-filter:none}
+#wrap.moving .card,#wrap.moving .lf,#wrap.moving svg path.sap,#wrap.moving svg .leaf-bud{animation-play-state:paused!important}
+.lf{will-change:auto}
+
+@media (max-width:600px){
+  header{top:calc(env(safe-area-inset-top,0px) + 6px);padding:8px 12px 10px;border-radius:22px;gap:6px;max-width:calc(100% - 16px)}
+  header h1{font-size:19px;line-height:1.1;letter-spacing:.01em}
+  .tools{gap:6px}
+  .tools button,#cpanel button{min-height:30px;padding:5px 10px;font-size:12px}
+  #cpanel{gap:6px;font-size:11px}
+  #st{display:none}
+  #st.bad{display:block;flex-basis:100%;font-size:10px;line-height:1.1;text-align:center}
+  .card{padding:3px 6px;border-radius:16px}
+  .card b{font-size:12px;line-height:1.12}
+  .card span{font-size:10.5px;margin-top:1px}
+  footer{font-size:10px;padding:4px 12px 6px}
+}
+
+/* mod lite: buang efek berat (Android / peranti lemah). Tambah ?lite=0 pada link untuk matikan, ?lite=1 untuk paksa. */
+html.lite .card,html.lite .card.c,html.lite .card.c.ns{animation:none;transition:none;box-shadow:0 3px 0 rgba(0,0,0,.2)!important}
+html.lite .card.on{box-shadow:0 0 0 3px rgba(37,120,92,.6),0 3px 0 rgba(0,0,0,.2)!important}
+html.lite .lf,html.lite svg path.sap,html.lite .sdeco{display:none!important}
+html.lite svg .leaf-bud{animation:none}
+html.lite svg path.branch,html.lite svg path.spouse-vine{filter:none}
+html.lite #modal{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(18,30,24,.62)}
+html.lite .sheet,html.lite #modal.open{animation:none}
+html.lite body{background-attachment:scroll}
+html.lite button{transition:none}
 </style>
 </head>
 <body>
@@ -504,17 +540,21 @@ html[data-theme=dark] .card.c.ns::after{background:rgba(255,255,255,.4)}
 const EDIT_PASS='0000';
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec';
 const KEY='salasilah.v1';
+const LITE=document.documentElement.classList.contains('lite');
 let W=150,H=52,GX=28,GY=78,CG=36;
-const TOP=50;
+let TOP=50,LB=47,LS=.95;
 
 function metrics(){
   const n=document.getElementById('wrap')?.clientWidth||innerWidth;
-  const m=n<600?[128,60,8,58,12]:(n<860?[140,58,12,66,18]:[156,60,16,76,24]);
-  const ch=m[0]!==W||m[1]!==H||m[2]!==GX||m[3]!==GY||m[4]!==CG;
-  [W,H,GX,GY,CG]=m;
+  const ph=n<600;
+  const m=ph?[128,52,6,44,10]:(n<860?[140,58,12,66,18]:[156,60,16,76,24]);
+  const t=ph?[34,38,.72]:[50,47,.95];
+  const ch=m[0]!==W||m[1]!==H||m[2]!==GX||m[3]!==GY||m[4]!==CG||t[0]!==TOP;
+  [W,H,GX,GY,CG]=m; [TOP,LB,LS]=t;
   const r=document.documentElement.style;
   r.setProperty('--cw',W+'px');
   r.setProperty('--ch',H+'px');
+  r.setProperty('--ls',LS);
   return ch;
 }
 metrics();
@@ -525,15 +565,23 @@ let colorMode=(['gen','nasab'].includes(localStorage.getItem(KEY+'.color'))?loca
 
 let cam={x:0,y:0,k:1,manual:false};
 
-/* Had pan: pokok tak boleh ditarik jauh dari skrin. slack = berapa jauh boleh lebih dari tepi. */
+/* ukuran di-cache supaya drag tak paksa layout berulang kali (punca lag Android) */
+let VW=0,VH=0,TI=0,BI=0,camRaf=0;
+function measure(){
+  const w=document.getElementById('wrap'),h=document.querySelector('header'),f=document.getElementById('foot');
+  VW=w.clientWidth; VH=w.clientHeight;
+  TI=h?Math.max(0,Math.round(h.getBoundingClientRect().bottom))+6:0;   /* ruang bawah island */
+  BI=f?f.offsetHeight:0;
+}
+/* Had pan: pokok tak boleh ditarik jauh dari skrin. Kawasan nampak = bawah island hingga atas footer. */
 function clampCam(){
-  const wrap=document.getElementById('wrap'); if(!dim||!wrap)return;
-  const vw=wrap.clientWidth, vh=wrap.clientHeight, tw=dim.w*cam.k, th=dim.h*cam.k;
+  if(!dim)return;
+  const vw=VW, vh=Math.max(120,VH-TI-BI), tw=dim.w*cam.k, th=dim.h*cam.k;
   const sx=Math.max(40,vw*.08), sy=Math.max(40,vh*.08);
-  const rx=tw>vw?[vw-tw-sx,sx]:[(vw-tw)/2-sx,(vw-tw)/2+sx];
-  const ry=th>vh?[vh-th-sy,sy]:[(vh-th)/2-sy,(vh-th)/2+sy];
+  const rx=tw>vw?[vw-tw-sx,sx]:[-sx,vw-tw+sx];     /* muat skrin: bebas gerak, tapi seluruh pokok kekal dalam skrin */
+  const ry=th>vh?[vh-th-sy,sy]:[-sy,vh-th+sy];
   cam.x=Math.min(rx[1],Math.max(rx[0],cam.x));
-  cam.y=Math.min(ry[1],Math.max(ry[0],cam.y));
+  cam.y=TI+Math.min(ry[1],Math.max(ry[0],cam.y-TI));
 }
 function applyCam(){
   const s=document.getElementById('stage');
@@ -541,22 +589,27 @@ function applyCam(){
   clampCam();
   s.style.transform=`translate3d(${cam.x}px, ${cam.y}px, 0) scale(${cam.k})`;
 }
+function queueCam(){
+  if(camRaf)return;
+  camRaf=requestAnimationFrame(()=>{camRaf=0;applyCam()});
+}
 
 function fit(){
-  const wrap=document.getElementById('wrap');
+  measure();
   if(!dim){cam={x:0,y:0,k:1,manual:false};applyCam();return}
-  const pad=24;
-  const aw=Math.max(120,wrap.clientWidth-pad*2);
-  const ah=Math.max(120,wrap.clientHeight-pad*2);
+  const pad=VW<600?12:24;
+  const avH=Math.max(120,VH-TI-BI);
+  const aw=Math.max(120,VW-pad*2);
+  const ah=Math.max(120,avH-pad*2);
   let k=1;
   if(fitOn){
-    k=wrap.clientWidth<600
+    k=VW<600
       ? Math.max(0.62, Math.min(1, aw/dim.w))
       : Math.min(1, aw/dim.w, ah/dim.h);
   }
   cam.k=k;
-  cam.x=(wrap.clientWidth-dim.w*k)/2;
-  cam.y=Math.max(pad,(wrap.clientHeight-dim.h*k)/2);
+  cam.x=(VW-dim.w*k)/2;
+  cam.y=TI+(VW<600?pad:Math.max(pad/2,(avH-dim.h*k)/2));   /* phone: rapat ke atas, bukan di tengah */
   cam.manual=false;
   applyCam();
 }
@@ -685,7 +738,7 @@ function render(){
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
       const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
       const fdel=(-((i*1.1+n.d*0.85)%4)).toFixed(2)+'s';
-      cards.push(`<button title="${esc((m.name||'')+nt)}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}<i class="lf a"></i><i class="lf b"></i><i class="lf c3"></i></button>`);
+      cards.push(`<button title="${esc((m.name||'')+nt)}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}${LITE?'':'<i class="lf a"></i><i class="lf b"></i><i class="lf c3"></i>'}</button>`);
     });
     maxY=Math.max(maxY,n.y+H);
     const two=n.members.length>1;
@@ -708,7 +761,7 @@ function render(){
       // Batang utama turun dari pasangan/induk ke simpang dahan
       const trunkD=`M${ox} ${oy} C${ox} ${oy+(forkY-oy)*0.55}, ${ox} ${forkY-(forkY-oy)*0.35}, ${ox} ${forkY}`;
       paths.push([trunkD,'branch',trunkW]);
-      paths.push([trunkD,'sap',2]);
+      if(!LITE)paths.push([trunkD,'sap',2]);
       knots.push(`<circle class="node-knot" cx="${ox}" cy="${forkY}" r="${Math.max(3,trunkW*0.85)}"/>`);
 
       // Dahan melengkung ke setiap anak
@@ -721,11 +774,11 @@ function render(){
         const brW=Math.max(2, trunkW*0.78);
         paths.push([dahanD, k.members[ci].pet?'branch d':'branch', brW]);
         if(!k.members[ci].pet){
-          paths.push([dahanD,'sap',1.8]);
+          if(!LITE)paths.push([dahanD,'sap',1.8]);
           // Tunas daun kecil di dahan
           const lx=(ox+kx)/2, ly=(forkY+ky)/2-2;
           const rot=kx>=ox?28:-28;
-          leaves.push(`<path class="leaf-bud" style="animation-delay:${-(idx*0.7)}s" d="M${lx} ${ly} C${lx+8} ${ly-9}, ${lx+15} ${ly-3}, ${lx+4} ${ly+4} Z" transform="rotate(${rot} ${lx} ${ly})"/>`);
+          if(!LITE)leaves.push(`<path class="leaf-bud" style="animation-delay:${-(idx*0.7)}s" d="M${lx} ${ly} C${lx+8} ${ly-9}, ${lx+15} ${ly-3}, ${lx+4} ${ly+4} Z" transform="rotate(${rot} ${lx} ${ly})"/>`);
         }
       });
     }
@@ -752,7 +805,7 @@ function render(){
     const y=TOP+d*(H+GY), hh=colorMode==='gen'?HUE_G[d%8]:null;
     const sty=hh===null?'':`;--gb:hsl(${hh} 45% 45% / .6);--gbf:hsl(${hh} 60% 50% / .06);--gi:hsl(${hh} 38% 17% / .92);--gib:hsl(${hh} 45% 55% / .55)`;
     bands+=`<div class="gband" style="left:8px;top:${y-10}px;width:${w-16}px;height:${H+20}px${sty}"></div>`;
-    labels+=`<input class="glbl" data-d="${d}" data-max="${Math.floor((w-28)/.95)}" maxlength="80" autocomplete="off" placeholder="+ label" value="${esc((db.gl[d]||{}).t||'')}" style="left:14px;top:${y-47}px${sty}">`;
+    labels+=`<input class="glbl" data-d="${d}" data-max="${Math.floor((w-28)/LS)}" maxlength="80" autocomplete="off" placeholder="+ label" value="${esc((db.gl[d]||{}).t||'')}" style="left:14px;top:${y-LB}px${sty}">`;
   });
   const svgDefs=`<defs><linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7c5d41"/><stop offset="55%" stop-color="#4e6e54"/><stop offset="100%" stop-color="#2d7a5b"/></linearGradient></defs>`;
   stage.innerHTML=bands+`<svg width="${w}" height="${stageH}">${svgDefs}${rootBases}${paths.map(p=>`<path class="${p[1]}" stroke-width="${p[2]}" d="${p[0]}"/>`).join('')}${leaves.join('')}${knots.join('')}</svg>`+cards.join('')+labels;
@@ -763,13 +816,18 @@ function render(){
 function scheduleFit(){
   cancelAnimationFrame(scheduleFit.r);
   scheduleFit.r=requestAnimationFrame(()=>{
+    measure();
     if(metrics())render();
     else if(!cam.manual)fit();
+    else applyCam();
   });
 }
 
 if(typeof ResizeObserver!=='undefined'){
-  new ResizeObserver(scheduleFit).observe(document.getElementById('wrap'));
+  const ro=new ResizeObserver(scheduleFit);
+  ro.observe(document.getElementById('wrap'));
+  ro.observe(document.querySelector('header'));
+  ro.observe(document.getElementById('foot'));
 }
 addEventListener('resize',scheduleFit);
 addEventListener('orientationchange',()=>setTimeout(scheduleFit,120));
@@ -1076,7 +1134,7 @@ function zoomAt(clientX,clientY,factor){
     localStorage.setItem(KEY+'.fit','0');
     $('fit').classList.remove('act');
   }
-  applyCam();
+  queueCam();
 }
 
 wrapEl.addEventListener('wheel',e=>{
@@ -1084,6 +1142,7 @@ wrapEl.addEventListener('wheel',e=>{
   e.preventDefault();
   const delta=-Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),120);
   const factor=Math.exp(delta*0.0018);
+  wrapEl.classList.add('moving'); clearTimeout(wrapEl._mv); wrapEl._mv=setTimeout(()=>wrapEl.classList.remove('moving'),180);
   zoomAt(e.clientX,e.clientY,factor);
 },{passive:false});
 
@@ -1117,7 +1176,8 @@ addEventListener('pointermove',e=>{
     cam.x+=newMidX-pinchState.midX;
     cam.y+=newMidY-pinchState.midY;
     cam.manual=true;
-    applyCam();
+    wrapEl.classList.add('moving');
+    queueCam();
     pinchState.dist=newDist;
     pinchState.midX=newMidX;
     pinchState.midY=newMidY;
@@ -1129,13 +1189,14 @@ addEventListener('pointermove',e=>{
   const dy=e.clientY-dragState.startY;
   if(!dragState.moved && Math.hypot(dx,dy)>5){
     dragState.moved=true;
-    wrapEl.classList.add('dragging');
+    wrapEl.classList.add('dragging','moving');
   }
   if(dragState.moved){
-    cam.x=dragState.origX+dx;
-    cam.y=dragState.origY+dy;
-    cam.manual=true;
-    applyCam();
+    const tx=dragState.origX+dx, ty=dragState.origY+dy;
+    cam.x=tx; cam.y=ty; cam.manual=true;
+    clampCam();
+    dragState.origX+=cam.x-tx; dragState.origY+=cam.y-ty;   /* rebase di tepi had: tarik balik terus bergerak, tak 'mati' */
+    queueCam();
   }
 });
 
@@ -1146,6 +1207,7 @@ function endPointer(e){
     const wasMoved=dragState.moved;
     dragState.active=false;
     wrapEl.classList.remove('dragging');
+    if(!pointers.size)wrapEl.classList.remove('moving');
     if(wasMoved){
       wrapEl.dataset.justDragged='1';
       setTimeout(()=>delete wrapEl.dataset.justDragged,50);
@@ -1212,7 +1274,7 @@ try{cfg=JSON.parse(localStorage.getItem(KEY+'.cfg'))||{}}catch(e){}
   }
 })();
 if(!cfg.url&&DEFAULT_URL){cfg={url:DEFAULT_URL,key:''};localStorage.setItem(KEY+'.cfg',JSON.stringify(cfg))}
-const st=t=>$('st').textContent=t;
+const st=t=>{const e=$('st');e.textContent=t;e.classList.toggle('bad',/gagal|offline/i.test(t))};
 const rowOut=p=>({id:p.id,name:p.name,rel:p.rel,born:p.born,note:p.note,parents:p.parents,inLawParents:p.inLawParents||[],spouse:p.spouse||'',pet:p.pet,g:p.g||'',ord:p.ord||'',updatedAt:p.updatedAt});
 function merge(rows){
   rows.forEach(r=>{
@@ -1237,8 +1299,10 @@ async function sync(){
     const rows=db.people.map(rowOut).concat(Object.keys(db.tomb).map(id=>({id,deleted:1,updatedAt:db.tomb[id]}))).concat(Object.keys(db.gl).map(k=>({id:'__gl_'+k,name:db.gl[k].t,rel:'',born:'',note:'',parents:[],inLawParents:[],spouse:'',pet:false,g:'',ord:'',updatedAt:db.gl[k].u})));
     const r=await fetch(cfg.url,{method:'POST',body:JSON.stringify({key:cfg.key,rows})});
     const j=await r.json(); if(j.error)throw new Error(j.error);
+    const before=JSON.stringify([db.people,db.gl,db.tomb]);
     merge(j.rows); save(false);
-    if(sel&&!P(sel))closePanel(); else if(!sel)render();
+    const changed=before!==JSON.stringify([db.people,db.gl,db.tomb]);
+    if(sel&&!P(sel))closePanel(); else if(!sel&&changed)render();
     st('Sync '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
   }catch(e){st('Sync gagal: '+e.message)}
   syncing=false;
