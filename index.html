@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Salasilah S.I.N.A.R.S</title>
 <script>try{if(localStorage.getItem('salasilah.v1.theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
-<script>(function(){var i=new Image();i.onload=function(){document.documentElement.classList.add('has-bg')};i.src='bg.jpeg'})();</script>
+<script>(function(){var i=new Image();i.onload=function(){document.documentElement.classList.add('has-bg')};i.src='bg.jpg'})();</script>
 <style>
 :root{
   --bg:#fafcf8;--ink:#233329;--card:#ffffff;--mute:#5b7062;--acc:#25785c;--panel:#ffffff;--line:#2d5a47;
@@ -332,6 +332,35 @@ html[data-theme=dark] .card.c{--lf:hsl(var(--h) 55% 62%)}
 }
 .glbl::placeholder{color:var(--mute);opacity:.75;font-style:italic}
 .glbl:focus{border-style:solid;box-shadow:0 0 0 3px rgba(37,120,92,.2)}
+
+/* ---------- Hiasan popup: burung & daun kecil ---------- */
+.sdeco{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0;color:hsl(var(--ah) 38% 30%)}
+.sheet>#view,.sheet>#edit,.sheet>#lock{position:relative;z-index:1}
+.bird{position:absolute;left:0;top:var(--y,30px);opacity:.62;scale:var(--sc,1);animation:birdFly var(--t,15s) linear var(--dl,0s) infinite}
+.bird svg{display:block;transform-origin:50% 85%;animation:birdFlap .42s ease-in-out infinite alternate}
+.bird.r{animation-name:birdFlyL}
+@keyframes birdFly{
+  0%{transform:translate(-30px,0)}25%{transform:translate(150px,-7px)}
+  50%{transform:translate(300px,4px)}75%{transform:translate(460px,-6px)}100%{transform:translate(640px,0)}
+}
+@keyframes birdFlyL{
+  0%{transform:translate(640px,0)}25%{transform:translate(470px,5px)}
+  50%{transform:translate(310px,-5px)}75%{transform:translate(150px,4px)}100%{transform:translate(-30px,0)}
+}
+@keyframes birdFlap{from{transform:scaleY(1)}to{transform:scaleY(.38)}}
+.pl{
+  position:absolute;top:-14px;left:var(--x,10%);width:var(--s,9px);height:var(--s,9px);
+  border-radius:0 100% 0 100%;background:hsl(calc(var(--ah) + var(--o,0)) 52% 52%);opacity:.5;
+  will-change:transform;animation:plDrop var(--d,12s) linear var(--dl,0s) infinite
+}
+@keyframes plDrop{
+  0%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(16px,26vh) rotate(90deg)}
+  50%{transform:translate(-12px,52vh) rotate(200deg)}75%{transform:translate(14px,78vh) rotate(290deg)}
+  100%{transform:translate(-4px,104vh) rotate(380deg)}
+}
+html[data-theme=dark] .sdeco{color:hsl(var(--ah) 50% 76%)}
+html[data-theme=dark] .pl{background:hsl(calc(var(--ah) + var(--o,0)) 55% 62%);opacity:.45}
+@media (prefers-reduced-motion:reduce){.sdeco{display:none}}
 </style>
 </head>
 <body>
@@ -355,6 +384,17 @@ html[data-theme=dark] .card.c{--lf:hsl(var(--h) 55% 62%)}
 
 <div id="modal">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="v-name">
+    <div class="sdeco" aria-hidden="true">
+      <span class="bird" style="--y:26px;--t:15s;--dl:-4s"><svg viewBox="0 0 24 12" width="18" height="9"><path d="M1 9 Q6 0 12 8 Q18 0 23 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="bird" style="--y:41px;--t:15s;--dl:-5.2s;--sc:.72"><svg viewBox="0 0 24 12" width="18" height="9"><path d="M1 9 Q6 0 12 8 Q18 0 23 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="bird r" style="--y:74px;--t:22s;--dl:-13s;--sc:.8"><svg viewBox="0 0 24 12" width="18" height="9"><path d="M1 9 Q6 0 12 8 Q18 0 23 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <i class="pl" style="--x:7%;--d:11s;--dl:-2s;--s:9px;--o:0"></i>
+      <i class="pl" style="--x:24%;--d:14s;--dl:-9s;--s:7px;--o:30"></i>
+      <i class="pl" style="--x:43%;--d:12s;--dl:-5s;--s:10px;--o:-20"></i>
+      <i class="pl" style="--x:61%;--d:15s;--dl:-11s;--s:8px;--o:45"></i>
+      <i class="pl" style="--x:78%;--d:10.5s;--dl:-1s;--s:9px;--o:15"></i>
+      <i class="pl" style="--x:92%;--d:13s;--dl:-7s;--s:7px;--o:-35"></i>
+    </div>
     <div id="view">
       <div class="head">
         <div class="av" id="v-av"></div>
