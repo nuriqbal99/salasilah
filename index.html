@@ -603,7 +603,7 @@ function build(p,d){
   const ids=members.map(m=>m.id);
   const ch=db.people.filter(c=>!placed.has(c.id)&&c.parents.some(x=>ids.includes(x)))
     .sort((a,b)=>(a.pet-b.pet)||((+a.ord||99)-(+b.ord||99)));
-  const n={members,d,kids:[]};
+  const n={members,d,kids:[],core:p.id};
   ch.forEach(c=>{if(!placed.has(c.id))n.kids.push(build(c,d+1))});
   n.own=members.length*W+(members.length-1)*CG;
   n.kw=n.kids.reduce((a,k)=>a+k.w,0)+Math.max(0,n.kids.length-1)*GX;
@@ -625,37 +625,40 @@ function layout(){
 }
 
 /* ---------- nasab (jalur bapa) ---------- */
-function nasabMap(){
+function nasabMap(roots){
+  // Nasab = jalur bapa direct dari pangkal. Pasangan (lelaki/perempuan), mertua, dan anak
+  // yang bapanya bukan dalam nasab (cth anak perempuan + suami luar) = bukan nasab.
   const byId=new Map(db.people.map(p=>[p.id,p]));
-  const fatherOf=p=>{
-    const ids=(p.parents||[]).concat(p.inLawParents||[]);
-    for(const id of ids){const q=byId.get(id);if(q&&q.g==='A'&&!q.pet)return q}
-    return null;
-  };
-  const topOf=p=>{
-    const seen=new Set([p.id]); let c=p,f;
-    while((f=fatherOf(c))&&!seen.has(f.id)){seen.add(f.id);c=f}
-    return c;
-  };
-  const lin=new Map();
+  const inlaw=new Set(), nodes=[], nas=new Set();
   db.people.forEach(p=>{
-    if(p.pet)return;
-    const t=topOf(p);
-    if(t.id===p.id&&p.g!=='A')return;   // perempuan/tak pasti & tiada bapa dalam pokok: jalur tak bersambung
-    lin.set(p.id,t.id);
+    (p.inLawParents||[]).forEach(id=>inlaw.add(id));
+    if(/mertua/i.test(p.rel||''))inlaw.add(p.id);
   });
-  const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)};
-  const used=[], hue={}, cnt={}, rs=[...new Set(lin.values())].sort();
-  lin.forEach(r=>{cnt[r]=(cnt[r]||0)+1});
-  let main=rs[0]; rs.forEach(r=>{if(cnt[r]>cnt[main])main=r});
-  if(main!==undefined){hue[main]=44;used.push(44)}   // jalur paling ramai = kuning gelap
-  rs.forEach(r=>{
-    if(r===main)return;
-    let h=hash(r)%360,t=0;
-    while(t<16&&used.some(u=>{const d=Math.abs(u-h)%360;return Math.min(d,360-d)<38})){h=(h+47)%360;t++}
-    used.push(h); hue[r]=h;
+  const collect=n=>{nodes.push(n);n.kids.forEach(collect)};
+  roots.forEach(collect);
+  const rootSet=new Set(roots);
+  nodes.forEach(n=>{
+    if(rootSet.has(n))return;
+    n.members.forEach(m=>{
+      if(m.id!==n.core)(m.parents||[]).concat(m.inLawParents||[]).forEach(id=>inlaw.add(id));
+    });
   });
-  return {lin,hue,byId};
+  const isFather=(q)=>q&&q.g==='A'&&!q.pet;
+  const walk=(n,pn)=>{
+    if(!pn){
+      const r=n.members.find(m=>isFather(m)&&!inlaw.has(m.id));
+      if(r)nas.add(r.id);
+    }else{
+      const c=byId.get(n.core);
+      if(c&&!c.pet&&!inlaw.has(c.id)){
+        const f=pn.members.find(m=>isFather(m)&&nas.has(m.id)&&c.parents.includes(m.id));
+        if(f)nas.add(c.id);
+      }
+    }
+    n.kids.forEach(k=>walk(k,n));
+  };
+  roots.forEach(r=>walk(r,null));
+  return {nas};
 }
 
 /* ---------- render ---------- */
@@ -671,14 +674,14 @@ function render(){
   }
   const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[], depths=new Set(); let maxY=0;
   const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?152:HUE_G[br%8]);
-  const NS=colorMode==='nasab'?nasabMap():null;
+  const NS=colorMode==='nasab'?nasabMap(roots):null;
 
   const walk=(n,br)=>{
     depths.add(n.d);
     n.members.forEach((m,i)=>{
-      const lid=NS?NS.lin.get(m.id):null, on=NS?lid!==undefined:colorMode!=='none';
-      const x=n.x+i*(W+CG), c=on?(NS?' c ns':' c'):'', h=on?`;--h:${NS?NS.hue[lid]:hue(n,br)}`:'';
-      const nt=(NS&&lid!==undefined&&NS.byId.get(lid))?' · Nasab '+(NS.byId.get(lid).name||''):'';
+      const inNs=!!(NS&&NS.nas.has(m.id)), on=NS?!m.pet:colorMode!=='none';
+      const x=n.x+i*(W+CG), c=on?(NS?' c ns':' c'):'', h=on?`;--h:${NS?(inNs?44:0):hue(n,br)}`:'';
+      const nt=(NS&&!m.pet)?(inNs?' · Nasab':' · Bukan nasab'):'';
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
       const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
       const fdel=(-((i*1.1+n.d*0.85)%4)).toFixed(2)+'s';
