@@ -303,11 +303,11 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
 
 /* ---------- Latar bg.jpeg (hanya aktif kalau fail wujud) ---------- */
 html.has-bg body::before{
-  opacity:1;background-repeat:no-repeat;background-position:center center;background-size:cover;
-  background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)),url("audio/bg.jpg")
+  opacity:.5;background-repeat:no-repeat;background-position:center center;background-size:cover;
+  background-image:url("audio/bg.jpg")
 }
 @supports (height:100lvh){html.has-bg body::before{height:100lvh}}
-html.has-bg[data-theme=dark] body::before{opacity:1;background-image:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),url("audio/bg.jpg")}
+html.has-bg[data-theme=dark] body::before{opacity:.5;background-image:url("audio/bg.jpg")}
 
 /* ---------- Daun kecil bergerak pada setiap kotak ---------- */
 .card{--lf:#4ba378}
@@ -325,13 +325,6 @@ html[data-theme=dark] .card.c{--lf:hsl(var(--h) 55% 62%)}
 
 /* ---------- Border putus-putus generasi + label ---------- */
 .gband{position:absolute;pointer-events:none;border:1.6px dashed var(--gb,rgba(37,120,92,.5));border-radius:22px;background:var(--gbf,rgba(37,120,92,.045))}
-.glbl{
-  position:absolute;z-index:2;width:143px;height:30px;min-height:0;font-size:16px;padding:0 10px;text-align:center;
-  border-radius:12px;background:var(--panel);color:var(--ink);border:1.5px dashed var(--gb,rgba(37,120,92,.55));box-shadow:none;
-  transform:scale(.7);transform-origin:0 100%;user-select:text;-webkit-user-select:text;touch-action:manipulation
-}
-.glbl::placeholder{color:var(--mute);opacity:.75;font-style:italic}
-.glbl:focus{border-style:solid;box-shadow:0 0 0 3px rgba(37,120,92,.2)}
 
 /* ---------- Hiasan popup: burung & daun kecil ---------- */
 .sdeco{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0;color:hsl(var(--ah) 38% 30%)}
@@ -361,6 +354,35 @@ html[data-theme=dark] .card.c{--lf:hsl(var(--h) 55% 62%)}
 html[data-theme=dark] .sdeco{color:hsl(var(--ah) 50% 76%)}
 html[data-theme=dark] .pl{background:hsl(calc(var(--ah) + var(--o,0)) 55% 62%);opacity:.45}
 @media (prefers-reduced-motion:reduce){.sdeco{display:none}}
+
+/* ---------- Island: header & label generasi ---------- */
+header{
+  align-self:center;width:fit-content;max-width:calc(100% - 24px);
+  margin:12px auto 4px;padding:14px 28px 16px;border-radius:34px;
+  background:rgba(14,24,19,.86);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 14px 34px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1)
+}
+header h1{color:#eaf6ee;text-shadow:0 2px 14px rgba(79,199,156,.3)}
+header #st{color:#a9c4b4!important}
+header #cpanel{color:#b8d1c3}
+html[data-theme=dark] header{background:rgba(8,14,11,.9);border-color:rgba(79,199,156,.22)}
+html[data-theme=dark] header h1{color:#e6f5ec}
+@media (max-width:600px){header{padding:12px 16px 14px;border-radius:28px;margin-top:8px}}
+@media (max-height:480px) and (orientation:landscape){header{padding:8px 18px 10px;margin-top:6px}}
+
+html input.glbl{
+  position:absolute;z-index:2;width:100px;height:34px;min-height:0;max-width:none;padding:0 16px;
+  font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.01em;text-align:center;text-overflow:ellipsis;
+  color:#eaf6ee;caret-color:#9fe3c6;background:var(--gi,rgba(14,24,19,.9));
+  border:1px solid var(--gib,rgba(255,255,255,.18));border-radius:999px;
+  box-shadow:0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  transform:scale(.95);transform-origin:0 100%;user-select:text;-webkit-user-select:text;touch-action:manipulation
+}
+html input.glbl::placeholder{color:#9db8a8;opacity:.9;font-style:italic;font-weight:500}
+html input.glbl:focus{outline:none;border-color:#6fd1a8;box-shadow:0 0 0 3px rgba(79,199,156,.3),0 6px 16px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -462,7 +484,7 @@ const EDIT_PASS='0000';
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec';
 const KEY='salasilah.v1';
 let W=150,H=52,GX=28,GY=78,CG=36;
-const TOP=38;
+const TOP=50;
 
 function metrics(){
   const n=document.getElementById('wrap')?.clientWidth||innerWidth;
@@ -666,12 +688,13 @@ function render(){
   let bands='',labels='';
   [...depths].sort((a,b)=>a-b).forEach(d=>{
     const y=TOP+d*(H+GY), hh=colorMode==='gen'?HUE_G[d%8]:null;
-    const sty=hh===null?'':`;--gb:hsl(${hh} 45% 45% / .6);--gbf:hsl(${hh} 60% 50% / .06)`;
+    const sty=hh===null?'':`;--gb:hsl(${hh} 45% 45% / .6);--gbf:hsl(${hh} 60% 50% / .06);--gi:hsl(${hh} 38% 17% / .92);--gib:hsl(${hh} 45% 55% / .55)`;
     bands+=`<div class="gband" style="left:8px;top:${y-10}px;width:${w-16}px;height:${H+20}px${sty}"></div>`;
-    labels+=`<input class="glbl" data-d="${d}" maxlength="24" autocomplete="off" placeholder="+ label" value="${esc((db.gl[d]||{}).t||'')}" style="left:14px;top:${y-43}px${sty}">`;
+    labels+=`<input class="glbl" data-d="${d}" data-max="${Math.floor((w-28)/.95)}" maxlength="80" autocomplete="off" placeholder="+ label" value="${esc((db.gl[d]||{}).t||'')}" style="left:14px;top:${y-47}px${sty}">`;
   });
   const svgDefs=`<defs><linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7c5d41"/><stop offset="55%" stop-color="#4e6e54"/><stop offset="100%" stop-color="#2d7a5b"/></linearGradient></defs>`;
   stage.innerHTML=bands+`<svg width="${w}" height="${stageH}">${svgDefs}${rootBases}${paths.map(p=>`<path class="${p[1]}" stroke-width="${p[2]}" d="${p[0]}"/>`).join('')}${leaves.join('')}${knots.join('')}</svg>`+cards.join('')+labels;
+  stage.querySelectorAll('.glbl').forEach(fitLbl);
   if(!cam.manual)fit(); else applyCam();
 }
 
@@ -1082,6 +1105,15 @@ $('stage').addEventListener('click',e=>{
 });
 
 /* ---------- label generasi ---------- */
+function fitLbl(el){
+  let m=fitLbl.m;
+  if(!m){m=fitLbl.m=document.createElement('span');m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;padding:0;letter-spacing:.01em';document.body.appendChild(m)}
+  const cs=getComputedStyle(el);
+  m.style.fontFamily=cs.fontFamily; m.style.fontSize=cs.fontSize; m.style.fontWeight=cs.fontWeight;
+  m.textContent=el.value||el.placeholder;
+  const w=Math.ceil(m.getBoundingClientRect().width)+38;
+  el.style.width=Math.max(100,Math.min(w,+el.dataset.max||9999))+'px';
+}
 function shiftGL(by){
   const o=db.gl||{}, n={}, now=Date.now();
   Object.keys(o).forEach(k=>{n[+k+by]={t:o[k].t,u:now}});
@@ -1095,7 +1127,7 @@ $('stage').addEventListener('focusin',e=>{
 });
 $('stage').addEventListener('input',e=>{
   const t=e.target; if(!t.classList||!t.classList.contains('glbl'))return;
-  db.gl[t.dataset.d]={t:t.value.slice(0,24),u:Date.now()}; save();
+  db.gl[t.dataset.d]={t:t.value.slice(0,80),u:Date.now()}; fitLbl(t); save();
 });
 $('stage').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('glbl'))e.target.blur();
