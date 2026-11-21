@@ -411,6 +411,7 @@ body{height:100vh;height:100dvh;overflow:hidden}
 header{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:0;right:0;margin:0 auto;z-index:6;width:fit-content;max-width:calc(100% - 20px);-webkit-backdrop-filter:none;backdrop-filter:none}
 footer{position:fixed;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);z-index:2;margin:0;padding:6px 12px 8px;border:0;background:none;pointer-events:none;text-shadow:0 1px 3px rgba(255,255,255,.85)}
 html[data-theme=dark] footer{text-shadow:0 1px 3px rgba(0,0,0,.8)}
+header,header *{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html input.glbl{transform:scale(var(--ls,.95));-webkit-backdrop-filter:none;backdrop-filter:none}
 #wrap.moving .card,#wrap.moving .lf,#wrap.moving svg path.sap,#wrap.moving svg .leaf-bud{animation-play-state:paused!important}
 .lf{will-change:auto}
@@ -1307,6 +1308,15 @@ async function sync(){
   }catch(e){st('Sync gagal: '+e.message)}
   syncing=false;
 }
+/* header: matikan zoom (pinch, double-tap, Ctrl+roda). Zoom pokok kekal di kawasan peta. */
+(function(){
+  const h=document.querySelector('header'), stop=e=>e.preventDefault();
+  h.addEventListener('wheel',stop,{passive:false});
+  h.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+  h.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>h.addEventListener(t,stop));   /* iOS Safari */
+  let last=0; h.addEventListener('touchend',e=>{const n=Date.now(); if(n-last<320)e.preventDefault(); last=n},{passive:false});   /* double-tap */
+})();
 function setupSync(){
   const u=prompt('URL web app Apps Script (kosongkan = putuskan sync)',cfg.url||DEFAULT_URL); if(u===null)return;
   if(!u.trim()){cfg={};localStorage.removeItem(KEY+'.cfg');return st('Offline')}
