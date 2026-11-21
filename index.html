@@ -309,6 +309,7 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
     <button id="fit" title="Center Tree">Center</button>
     <button id="clr" aria-expanded="false">Warna</button>
     <button id="dm" aria-pressed="false" title="Tukar mod gelap">🌙 Dark: Off</button>
+    <button id="bgmBtn" aria-pressed="false" title="Muzik latar">🔇 Muzik: Off</button>
   </div>
   <div id="cpanel">
     <span>Warna:</span>
@@ -382,6 +383,7 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
   </div>
 </div>
 <div id="toast"></div>
+<audio id="bgm" src="audio/bgm.mp3" loop preload="none"></audio>
 
 <script>
 const EDIT_PASS='0000';
@@ -1046,6 +1048,25 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
 setInterval(()=>{if(!document.hidden)sync()},30000);
 st(cfg.url?'':'Offline (data dalam browser ni je)');
 if(cfg.url)sync();
+</script>
+<script>
+(function(){
+  var bgm=document.getElementById('bgm'), btn=document.getElementById('bgmBtn');
+  if(!bgm||!btn)return;
+  bgm.volume=0.3;
+  function ui(){
+    var on=!bgm.paused;
+    btn.textContent=on?'🔊 Muzik: On':'🔇 Muzik: Off';
+    btn.setAttribute('aria-pressed',on?'true':'false');
+  }
+  btn.addEventListener('click',function(){
+    if(bgm.paused){bgm.play().catch(function(){btn.textContent='⚠️ Fail muzik tak jumpa'})}
+    else{bgm.pause()}
+  });
+  bgm.addEventListener('play',ui);
+  bgm.addEventListener('pause',ui);
+  document.addEventListener('visibilitychange',function(){if(document.hidden&&!bgm.paused)bgm.pause()});
+})();
 </script>
 </body>
 </html>
