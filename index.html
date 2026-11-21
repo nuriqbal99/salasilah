@@ -383,6 +383,26 @@ html input.glbl{
 }
 html input.glbl::placeholder{color:#9db8a8;opacity:.9;font-style:italic;font-weight:500}
 html input.glbl:focus{outline:none;border-color:#6fd1a8;box-shadow:0 0 0 3px rgba(79,199,156,.3),0 6px 16px rgba(0,0,0,.3)}
+
+/* ---------- Mod Nasab: kotak gelap & pekat ---------- */
+.card.c.ns{
+  --cbg:linear-gradient(150deg,hsl(var(--h) 72% 35%),hsl(var(--h) 76% 25%));
+  --lf:hsl(var(--h) 85% 68%);
+  border-color:hsl(var(--h) 80% 18%);
+  box-shadow:0 5px 0 hsl(var(--h) 80% 12% / .6),0 14px 26px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.22)
+}
+.card.c.ns b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.card.c.ns span{color:hsl(var(--h) 85% 90%)}
+.card.c.ns::after{background:rgba(255,255,255,.4)}
+html[data-theme=dark] .card.c.ns{
+  --cbg:linear-gradient(150deg,hsl(var(--h) 66% 36%),hsl(var(--h) 70% 26%));
+  --lf:hsl(var(--h) 85% 70%);
+  border-color:hsl(var(--h) 70% 55%);
+  box-shadow:0 5px 0 rgba(0,0,0,.55),0 14px 26px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.2)
+}
+html[data-theme=dark] .card.c.ns b{color:#fff}
+html[data-theme=dark] .card.c.ns span{color:hsl(var(--h) 85% 88%)}
+html[data-theme=dark] .card.c.ns::after{background:rgba(255,255,255,.4)}
 </style>
 </head>
 <body>
@@ -625,10 +645,14 @@ function nasabMap(){
     lin.set(p.id,t.id);
   });
   const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)};
-  const used=[], hue={};
-  [...new Set(lin.values())].sort().forEach(r=>{
+  const used=[], hue={}, cnt={}, rs=[...new Set(lin.values())].sort();
+  lin.forEach(r=>{cnt[r]=(cnt[r]||0)+1});
+  let main=rs[0]; rs.forEach(r=>{if(cnt[r]>cnt[main])main=r});
+  if(main!==undefined){hue[main]=44;used.push(44)}   // jalur paling ramai = kuning gelap
+  rs.forEach(r=>{
+    if(r===main)return;
     let h=hash(r)%360,t=0;
-    while(t<14&&used.some(u=>{const d=Math.abs(u-h)%360;return Math.min(d,360-d)<30})){h=(h+47)%360;t++}
+    while(t<16&&used.some(u=>{const d=Math.abs(u-h)%360;return Math.min(d,360-d)<38})){h=(h+47)%360;t++}
     used.push(h); hue[r]=h;
   });
   return {lin,hue,byId};
@@ -653,7 +677,7 @@ function render(){
     depths.add(n.d);
     n.members.forEach((m,i)=>{
       const lid=NS?NS.lin.get(m.id):null, on=NS?lid!==undefined:colorMode!=='none';
-      const x=n.x+i*(W+CG), c=on?' c':'', h=on?`;--h:${NS?NS.hue[lid]:hue(n,br)}`:'';
+      const x=n.x+i*(W+CG), c=on?(NS?' c ns':' c'):'', h=on?`;--h:${NS?NS.hue[lid]:hue(n,br)}`:'';
       const nt=(NS&&lid!==undefined&&NS.byId.get(lid))?' · Nasab '+(NS.byId.get(lid).name||''):'';
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
       const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
