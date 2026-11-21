@@ -304,10 +304,10 @@ html[data-theme=dark] #toast{background:#e3efe7;color:#13201a}
 /* ---------- Latar bg.jpeg (hanya aktif kalau fail wujud) ---------- */
 html.has-bg body::before{
   opacity:1;background-repeat:no-repeat;background-position:center center;background-size:cover;
-  background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)),url("audio/bg.jpeg")
+  background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)),url("audio/bg.jpg")
 }
 @supports (height:100lvh){html.has-bg body::before{height:100lvh}}
-html.has-bg[data-theme=dark] body::before{opacity:1;background-image:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),url("audio/bg.jpeg")}
+html.has-bg[data-theme=dark] body::before{opacity:1;background-image:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),url("audio/bg.jpg")}
 
 /* ---------- Daun kecil bergerak pada setiap kotak ---------- */
 .card{--lf:#4ba378}
