@@ -713,13 +713,14 @@ function render(){
 
       // Dahan melengkung ke setiap anak
       n.kids.forEach((k,idx)=>{
-        const kx=k.x+W/2, ky=k.y;
+        const ci=Math.max(0,k.members.findIndex(m=>m.id===k.core));   // dahan ke anak sebenar (teras), bukan menantu
+        const kx=k.x+ci*(W+CG)+W/2, ky=k.y;
         const c1x=ox+(kx-ox)*0.22, c1y=forkY+(ky-forkY)*0.65;
         const c2x=kx-(kx-ox)*0.12, c2y=forkY+(ky-forkY)*0.32;
         const dahanD=`M${ox} ${forkY} C${c1x} ${c1y}, ${c2x} ${c2y}, ${kx} ${ky}`;
         const brW=Math.max(2, trunkW*0.78);
-        paths.push([dahanD, k.members[0].pet?'branch d':'branch', brW]);
-        if(!k.members[0].pet){
+        paths.push([dahanD, k.members[ci].pet?'branch d':'branch', brW]);
+        if(!k.members[ci].pet){
           paths.push([dahanD,'sap',1.8]);
           // Tunas daun kecil di dahan
           const lx=(ox+kx)/2, ly=(forkY+ky)/2-2;
