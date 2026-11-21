@@ -399,6 +399,7 @@ html input.glbl:focus{outline:none;border-color:#6fd1a8;box-shadow:0 0 0 3px rgb
     <span>Warna:</span>
     <button data-m="none">Normal</button>
     <button data-m="gen">Generasi</button>
+    <button data-m="nasab">Nasab</button>
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
@@ -500,7 +501,7 @@ metrics();
 
 const HUE_G=[152,36,205,342,265,18,95,295];
 let db=load(), sel=null, mode='view', placed=new Set(), unlocked=false, pending=null, editSnap=null, isNewEntry=false;
-let colorMode=(localStorage.getItem(KEY+'.color')==='gen'?'gen':'none'), dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
+let colorMode=(['gen','nasab'].includes(localStorage.getItem(KEY+'.color'))?localStorage.getItem(KEY+'.color'):'none'), dim=null, fitOn=localStorage.getItem(KEY+'.fit')!=='0';
 
 let cam={x:0,y:0,k:1,manual:false};
 
@@ -603,6 +604,36 @@ function layout(){
   return {roots,w:Math.max(x-GX*2+24,260)};
 }
 
+/* ---------- nasab (jalur bapa) ---------- */
+function nasabMap(){
+  const byId=new Map(db.people.map(p=>[p.id,p]));
+  const fatherOf=p=>{
+    const ids=(p.parents||[]).concat(p.inLawParents||[]);
+    for(const id of ids){const q=byId.get(id);if(q&&q.g==='A'&&!q.pet)return q}
+    return null;
+  };
+  const topOf=p=>{
+    const seen=new Set([p.id]); let c=p,f;
+    while((f=fatherOf(c))&&!seen.has(f.id)){seen.add(f.id);c=f}
+    return c;
+  };
+  const lin=new Map();
+  db.people.forEach(p=>{
+    if(p.pet)return;
+    const t=topOf(p);
+    if(t.id===p.id&&p.g!=='A')return;   // perempuan/tak pasti & tiada bapa dalam pokok: jalur tak bersambung
+    lin.set(p.id,t.id);
+  });
+  const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)};
+  const used=[], hue={};
+  [...new Set(lin.values())].sort().forEach(r=>{
+    let h=hash(r)%360,t=0;
+    while(t<14&&used.some(u=>{const d=Math.abs(u-h)%360;return Math.min(d,360-d)<30})){h=(h+47)%360;t++}
+    used.push(h); hue[r]=h;
+  });
+  return {lin,hue,byId};
+}
+
 /* ---------- render ---------- */
 function render(){
   const ae=document.activeElement;
@@ -616,15 +647,18 @@ function render(){
   }
   const {roots,w}=layout(), cards=[], paths=[], knots=[], leaves=[], depths=new Set(); let maxY=0;
   const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?152:HUE_G[br%8]);
+  const NS=colorMode==='nasab'?nasabMap():null;
 
   const walk=(n,br)=>{
     depths.add(n.d);
     n.members.forEach((m,i)=>{
-      const x=n.x+i*(W+CG), c=colorMode==='none'?'':' c', h=colorMode==='none'?'':`;--h:${hue(n,br)}`;
+      const lid=NS?NS.lin.get(m.id):null, on=NS?lid!==undefined:colorMode!=='none';
+      const x=n.x+i*(W+CG), c=on?' c':'', h=on?`;--h:${NS?NS.hue[lid]:hue(n,br)}`:'';
+      const nt=(NS&&lid!==undefined&&NS.byId.get(lid))?' · Nasab '+(NS.byId.get(lid).name||''):'';
       const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
       const fd=(4.2+((i+n.d*3)%5)*0.45).toFixed(2)+'s';
       const fdel=(-((i*1.1+n.d*0.85)%4)).toFixed(2)+'s';
-      cards.push(`<button title="${esc(m.name||'')}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}<i class="lf a"></i><i class="lf b"></i><i class="lf c3"></i></button>`);
+      cards.push(`<button title="${esc((m.name||'')+nt)}" class="card${c}${m.pet?' pet':''}${sel===m.id?' on':''}" data-id="${m.id}" style="left:${x}px;top:${n.y}px;--fd:${fd};--fdel:${fdel}${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<span>${esc(sub)}</span>`:''}<i class="lf a"></i><i class="lf b"></i><i class="lf c3"></i></button>`);
     });
     maxY=Math.max(maxY,n.y+H);
     const two=n.members.length>1;
