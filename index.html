@@ -440,6 +440,71 @@ html.lite #modal{-webkit-backdrop-filter:none;backdrop-filter:none;background:rg
 html.lite .sheet,html.lite #modal.open{animation:none}
 html.lite body{background-attachment:scroll}
 html.lite button{transition:none}
+
+/* ================= v2.6: paparan senarai berlapis untuk phone + header ikon ================= */
+.phone-only{display:none}
+#fit .ic,#clr .ic{display:none}
+#outline{display:none;position:fixed;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:var(--ti,70px) max(8px,env(safe-area-inset-right)) calc(var(--bi,28px) + 14px) max(8px,env(safe-area-inset-left))}
+html.list #outline{display:block}
+html.list #wrap,html.list #fit,html.list footer{display:none}
+#ofoot{text-align:center;font-size:11px;letter-spacing:.08em;color:var(--mute);padding:14px 0 4px}
+#ow{max-width:620px;margin:0 auto}
+#obar{position:sticky;top:0;z-index:3;display:flex;gap:6px;align-items:center;padding:6px;border-radius:18px;
+  background:rgba(250,252,248,.94);border:1px solid rgba(37,120,92,.25);box-shadow:0 6px 16px rgba(35,51,41,.14)}
+#osr{flex:1;min-width:0;min-height:38px;height:38px;border-radius:999px;padding:0 14px}
+#obar button{flex:none;width:38px;height:38px;min-height:38px;padding:0;border-radius:50%;font-size:17px;display:inline-flex;align-items:center;justify-content:center}
+#olist{margin-top:8px;padding:6px 8px 12px;border-radius:20px;background:rgba(250,252,248,.8);border:1px solid rgba(37,120,92,.2);box-shadow:0 8px 22px rgba(35,51,41,.1)}
+#olist #empty{position:static;transform:none;margin:18px auto;width:auto}
+.ol{list-style:none;margin:0;padding:0}
+.ol .ol{margin:0 0 0 8px;padding:0 0 0 6px;border-left:2px dashed rgba(37,120,92,.38)}
+.ol .ol .ol .ol .ol{margin-left:3px;padding-left:4px}   /* generasi dalam: tak tambah indent lagi supaya ruang tak habis */
+.nr{display:flex;align-items:center;gap:5px;margin:4px 0}
+.cp{display:flex;flex-wrap:wrap;gap:5px;flex:1;min-width:0}
+#olist .tg{flex:none;min-width:34px;height:30px;padding:0 5px;border-radius:10px;font-size:11px;font-weight:700;box-shadow:none;background:rgba(37,120,92,.12);border:1px solid rgba(37,120,92,.32);color:var(--ink)}
+#olist .tg.nil{visibility:hidden;border:0;background:none}
+#olist span.tg.nil{display:inline-block}
+.gcap{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:8px 0 0 4px}
+.ores{font-size:12px;color:var(--mute);margin:2px 6px 6px}
+#olist .oc{flex:1 1 104px;min-width:0;max-width:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;
+  padding:5px 9px;min-height:38px;border-radius:12px;border:1.5px solid rgba(49,142,107,.45);background:var(--cg);color:var(--ink);
+  box-shadow:0 2px 0 rgba(37,120,92,.24);transition:none;font-weight:600}
+#olist .oc:hover,#olist .oc:active{transform:none;filter:none}
+#olist .oc b{font-size:13px;line-height:1.15;color:#1b3326;overflow-wrap:anywhere}
+#olist .oc small{font-size:10.5px;line-height:1.2;color:var(--mute);font-weight:500;margin-top:1px}
+#olist .oc.sp b::before{content:"♥ ";color:#d97b54}
+#olist .oc.pet{border-style:dashed}
+#olist .oc.on{box-shadow:0 0 0 3px rgba(37,120,92,.5),0 2px 0 rgba(37,120,92,.24)}
+#olist .oc.hit{box-shadow:0 0 0 3px #e0a43a,0 2px 0 rgba(37,120,92,.24)}
+#olist .oc.c{background:linear-gradient(150deg,hsl(var(--h) 72% 96%),hsl(calc(var(--h) + 22) 62% 88%));border-color:hsl(var(--h) 48% 56%)}
+#olist .oc.c b{color:hsl(var(--h) 45% 18%)}
+#olist .oc.c small{color:hsl(var(--h) 30% 34%)}
+#olist .oc.c.ns{background:linear-gradient(150deg,hsl(var(--h) 72% 35%),hsl(var(--h) 76% 25%));border-color:hsl(var(--h) 80% 18%)}
+#olist .oc.c.ns b{color:#fff}
+#olist .oc.c.ns small{color:hsl(var(--h) 85% 90%)}
+html[data-theme=dark] #obar{background:rgba(14,24,19,.95);border-color:rgba(79,199,156,.28);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+html[data-theme=dark] #olist{background:rgba(14,24,19,.84);border-color:rgba(79,199,156,.25);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+html[data-theme=dark] .ol .ol{border-left-color:rgba(79,199,156,.35)}
+html[data-theme=dark] #olist .oc{border-color:rgba(79,199,156,.4);box-shadow:0 2px 0 rgba(0,0,0,.45)}
+html[data-theme=dark] #olist .oc b{color:#e6f3ea}
+html[data-theme=dark] #olist .oc.c{background:linear-gradient(150deg,hsl(var(--h) 38% 22%),hsl(calc(var(--h) + 22) 34% 17%));border-color:hsl(var(--h) 45% 42%)}
+html[data-theme=dark] #olist .oc.c b{color:hsl(var(--h) 60% 90%)}
+html[data-theme=dark] #olist .oc.c small{color:hsl(var(--h) 30% 72%)}
+html[data-theme=dark] #olist .oc.c.ns{background:linear-gradient(150deg,hsl(var(--h) 66% 36%),hsl(var(--h) 70% 26%));border-color:hsl(var(--h) 70% 55%)}
+html[data-theme=dark] #olist .oc.c.ns b{color:#fff}
+html[data-theme=dark] #olist .tg{background:rgba(79,199,156,.14);border-color:rgba(79,199,156,.35)}
+
+@media (max-width:600px){
+  .phone-only{display:inline-flex}
+  header{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 10px;padding:6px 10px 7px;border-radius:20px}
+  header h1{width:auto;font-size:14px;white-space:nowrap;letter-spacing:.01em}
+  .tools{gap:5px;flex-wrap:nowrap}
+  .tools .tx{display:none}
+  #fit .ic,#clr .ic{display:inline}
+  .tools button{min-width:32px;width:32px;height:32px;min-height:32px;padding:0;border-radius:50%;font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+  #cpanel{flex-basis:100%;justify-content:center}
+  #cpanel button{width:auto;height:auto;border-radius:999px}
+}
 </style>
 </head>
 <body>
@@ -447,10 +512,11 @@ html.lite button{transition:none}
   <h1>Salasilah S.I.N.A.R.S</h1>
   <div class="tools">
     <span id="st" style="font-size:12px;color:var(--mute)"></span>
-    <button id="fit" title="Center Tree">Center</button>
-    <button id="clr" aria-expanded="false">Warna</button>
-    <button id="dm" aria-pressed="false" title="Tukar mod gelap">🌙 Dark: Off</button>
-    <button id="bgmBtn" aria-pressed="false" title="Muzik latar">🔇 Muzik: Off</button>
+    <button id="fit" title="Center Tree"><span class="ic">⌖</span><span class="tx">Center</span></button>
+    <button id="clr" aria-expanded="false" title="Warna"><span class="ic">🎨</span><span class="tx">Warna</span></button>
+    <button id="dm" aria-pressed="false" title="Tukar mod gelap"><span class="ic">🌙</span><span class="tx"> Dark: Off</span></button>
+    <button id="bgmBtn" aria-pressed="false" title="Muzik latar"><span class="ic">🔇</span><span class="tx"> Muzik: Off</span></button>
+    <button id="vw" class="phone-only" title="Tukar paparan"><span class="ic">🌳</span><span class="tx"> Pokok</span></button>
   </div>
   <div id="cpanel">
     <span>Warna:</span>
@@ -460,6 +526,11 @@ html.lite button{transition:none}
   </div>
 </header>
 <div id="wrap"><div id="stage"></div></div>
+<div id="outline"><div id="ow">
+  <div id="obar"><input id="osr" type="search" placeholder="Cari nama…" autocomplete="off" enterkeyhint="search" aria-label="Cari nama"><button id="oexp" title="Buka semua">＋</button><button id="ocol" title="Lipat semua">－</button></div>
+  <div id="olist"></div>
+  <div id="ofoot"></div>
+</div></div>
 <footer id="foot">2026 SINARS. All rights reserved.</footer>
 
 <div id="modal">
@@ -542,6 +613,10 @@ const EDIT_PASS='0000';
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbyo2Igiz6auWG5gyV5PWZOFL2J-PTKqqp0GFBQfZ48Kjv__IkBbGHAySmFzpdyMiszxyQ/exec';
 const KEY='salasilah.v1';
 const LITE=document.documentElement.classList.contains('lite');
+let viewPref=localStorage.getItem('salasilah.v1.view')==='tree'?'tree':'list';
+const collapsed=new Set((()=>{try{return JSON.parse(localStorage.getItem('salasilah.v1.col')||'[]')}catch(e){return[]}})());
+const saveCol=()=>{try{localStorage.setItem('salasilah.v1.col',JSON.stringify([...collapsed]))}catch(e){}};
+const listMode=()=>innerWidth<600&&viewPref!=='tree';
 let W=150,H=52,GX=28,GY=78,CG=36;
 let TOP=50,LB=47,LS=.95;
 
@@ -720,6 +795,10 @@ function render(){
   const ae=document.activeElement;
   if(ae&&ae.classList&&ae.classList.contains('glbl')){render.pending=1;return}
   metrics();
+  const lm=listMode();
+  document.documentElement.classList.toggle('list',lm);
+  syncViewBtn();
+  if(lm){renderList();return}
   const stage=document.getElementById('stage');
   if(!db.people.length){
     stage.style.width='100%';stage.style.height='100%';dim=null;fit();
@@ -818,6 +897,7 @@ function scheduleFit(){
   cancelAnimationFrame(scheduleFit.r);
   scheduleFit.r=requestAnimationFrame(()=>{
     measure();
+    if(listMode()){listInsets();if(metrics())render();return}
     if(metrics())render();
     else if(!cam.manual)fit();
     else applyCam();
@@ -845,6 +925,7 @@ $('clr').onclick=()=>{
 $('cpanel').addEventListener('click',e=>{
   const b=e.target.closest('[data-m]'); if(!b)return;
   colorMode=b.dataset.m; localStorage.setItem(KEY+'.color',colorMode); syncColorUI(); render();
+  if(innerWidth<600){$('cpanel').classList.remove('open');$('clr').setAttribute('aria-expanded','false');scheduleFit()}
 });
 $('fit').classList.toggle('act',fitOn);
 $('fit').onclick=()=>{
@@ -857,13 +938,13 @@ $('fit').onclick=()=>{
 function setTheme(dark,store=true){
   document.documentElement.dataset.theme=dark?'dark':'light';
   const b=$('dm'); b.setAttribute('aria-pressed',dark?'true':'false');
-  b.textContent=dark?'☀️ Dark: On':'🌙 Dark: Off'; b.classList.toggle('act',dark);
+  b.innerHTML='<span class="ic">'+(dark?'☀️':'🌙')+'</span><span class="tx"> Dark: '+(dark?'On':'Off')+'</span>'; b.classList.toggle('act',dark);
   if(store)try{localStorage.setItem(KEY+'.theme',dark?'dark':'light')}catch(e){}
 }
 setTheme(document.documentElement.dataset.theme==='dark',false);
 $('dm').onclick=()=>setTheme(document.documentElement.dataset.theme!=='dark');
 syncColorUI();
-if(colorMode!=='none')$('cpanel').classList.add('open');
+if(colorMode!=='none'&&innerWidth>=600)$('cpanel').classList.add('open');
 
 /* ---------- popup ---------- */
 const RELS=['Aku','Ayah','Mak','Datuk','Nenek','Pasangan','Anak','Menantu','Cucu','Ayah mertua','Mak mertua','Adik-beradik','Haiwan'];
@@ -1317,6 +1398,73 @@ async function sync(){
   ['gesturestart','gesturechange','gestureend'].forEach(t=>h.addEventListener(t,stop));   /* iOS Safari */
   let last=0; h.addEventListener('touchend',e=>{const n=Date.now(); if(n-last<320)e.preventDefault(); last=n},{passive:false});   /* double-tap */
 })();
+/* ---------- paparan senarai berlapis (phone) ---------- */
+function syncViewBtn(){
+  const b=$('vw'); if(!b)return; const l=listMode();
+  b.innerHTML=l?'<span class="ic">🌳</span><span class="tx"> Pokok</span>':'<span class="ic">☰</span><span class="tx"> Senarai</span>';
+  b.title=l?'Tukar ke paparan pokok':'Tukar ke paparan senarai';
+}
+$('vw').onclick=()=>{
+  viewPref=listMode()?'tree':'list';
+  try{localStorage.setItem('salasilah.v1.view',viewPref)}catch(e){}
+  cam.manual=false; render();
+};
+function listInsets(){
+  measure();
+  const o=$('outline'); o.style.setProperty('--ti',TI+'px'); o.style.setProperty('--bi',BI+'px');
+}
+function renderList(){
+  const box=$('outline'), host=$('olist'), y0=box.scrollTop;
+  listInsets();
+  $('ofoot').textContent=($('foot')||{}).textContent||'';
+  if(!db.people.length){
+    host.innerHTML='<div id="empty"><p>Memuat Data...</p><button id="first">Tambah orang pertama</button> <button id="conn">Sambung Sync (kalau data family dah ada)</button></div>';
+    return;
+  }
+  const {roots}=layout();
+  const NS=colorMode==='nasab'?nasabMap(roots):null;
+  const q=($('osr').value||'').trim().toLowerCase(), hit=new Set();
+  if(q)db.people.forEach(p=>{if((p.name||'').toLowerCase().includes(q)||(p.rel||'').toLowerCase().includes(q))hit.add(p.id)});
+  const has=n=>{n._h=n.members.some(m=>hit.has(m.id));n.kids.forEach(k=>{if(has(k))n._h=true});return n._h};
+  if(q)roots.forEach(has);
+  const hue=(n,br)=>colorMode==='gen'?HUE_G[n.d%8]:(br<0?152:HUE_G[br%8]);
+  const cores=[];
+  const chip=(m,n,br)=>{
+    const inNs=!!(NS&&NS.nas.has(m.id)), on=NS?inNs:colorMode!=='none';
+    const c=on?(NS?' c ns':' c'):'', h=on?`--h:${NS?44:hue(n,br)}`:'';
+    const sub=[m.rel,(m.ord&&!m.pet)?'ke-'+m.ord:''].filter(Boolean).join(' · ');
+    return `<button class="oc${c}${m.pet?' pet':''}${m.id!==n.core?' sp':''}${sel===m.id?' on':''}${hit.has(m.id)?' hit':''}" data-id="${m.id}" style="${h}"><b>${esc(m.name||'Tanpa nama')}</b>${sub?`<small>${esc(sub)}</small>`:''}</button>`;
+  };
+  const node=(n,br)=>{
+    if(q&&!n._h)return '';
+    const kids=q?n.kids.filter(k=>k._h):n.kids;
+    const open=!!q||!collapsed.has(n.core);
+    if(n.kids.length&&n.d>0)cores.push(n.core);
+    const tg=n.kids.length?`<button class="tg" data-core="${n.core}" aria-expanded="${open}" title="Buka/lipat anak">${open?'▾':'▸'} ${n.kids.length}</button>`:'<span class="tg nil"></span>';
+    let sub='';
+    if(open&&kids.length){
+      const lb=(db.gl[n.d+1]||{}).t;
+      sub=`<ul class="ol">${lb?`<li class="gcap">${esc(lb)}</li>`:''}${kids.map((k,i)=>node(k,n.d===0?i:br)).join('')}</ul>`;
+    }
+    return `<li><div class="nr">${tg}<div class="cp">${n.members.map(m=>chip(m,n,br)).join('')}</div></div>${sub}</li>`;
+  };
+  const lb0=(db.gl[0]||{}).t;
+  const body=roots.map(r=>node(r,-1)).join('');
+  host.innerHTML=(q?`<div class="ores">${hit.size?hit.size+' padanan':'Tiada padanan'}</div>`:'')+`<ul class="ol">${lb0?`<li class="gcap">${esc(lb0)}</li>`:''}${body}</ul>`;
+  renderList.cores=cores;
+  box.scrollTop=y0;
+}
+$('osr').addEventListener('input',()=>{clearTimeout(renderList.t);renderList.t=setTimeout(renderList,120)});
+$('oexp').onclick=()=>{collapsed.clear();saveCol();renderList()};
+$('ocol').onclick=()=>{(renderList.cores||[]).forEach(id=>collapsed.add(id));saveCol();renderList()};
+$('olist').addEventListener('click',e=>{
+  const t=e.target.closest('.tg');
+  if(t&&t.dataset&&t.dataset.core){const id=t.dataset.core;collapsed.has(id)?collapsed.delete(id):collapsed.add(id);saveCol();renderList();return}
+  if(e.target.id==='conn')return setupSync();
+  if(e.target.id==='first')return gate(()=>{const snap=JSON.stringify(db);const p=addPerson({name:'Aku',rel:'Aku'});after(p,snap)});
+  const c=e.target.closest('.oc'); if(c)openPanel(c.dataset.id,'view');
+});
+
 function setupSync(){
   const u=prompt('URL web app Apps Script (kosongkan = putuskan sync)',cfg.url||DEFAULT_URL); if(u===null)return;
   if(!u.trim()){cfg={};localStorage.removeItem(KEY+'.cfg');return st('Offline')}
@@ -1334,7 +1482,7 @@ if(cfg.url)sync();
   bgm.volume=0.3;
   function ui(){
     var on=!bgm.paused;
-    btn.textContent=on?'🔊 Muzik: On':'🔇 Muzik: Off';
+    btn.innerHTML='<span class="ic">'+(on?'🔊':'🔇')+'</span><span class="tx"> Muzik: '+(on?'On':'Off')+'</span>';
     btn.setAttribute('aria-pressed',on?'true':'false');
   }
   btn.addEventListener('click',function(){
